@@ -215,6 +215,17 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 .pair__arrow path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .note { margin-top: 30px; max-width: 36em; color: var(--muted); font-size: 1rem; }
 
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); }
+.duo figure { margin: 0; min-width: 0; }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 clamp(20px, 3vw, 40px); }
+.flow li { min-width: 0; padding-top: 20px; border-top: 2px solid var(--ink); }
+.flow__n { font: 500 0.8125rem/1 var(--font-mono); color: var(--marker); }
+.flow h3 { margin-top: 12px; font-size: 1.3rem; }
+.flow p { margin-top: 10px; color: var(--muted); font-size: 0.98rem; }
+.foot__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 800 1rem/1.4 var(--font-display); letter-spacing: -0.03em; }
+@media (max-width: 900px) { .duo { grid-template-columns: minmax(0, 1fr); max-width: 640px; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 24px; } }
+@media (max-width: 520px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+
 /* ---------- 직접 써 보기 ---------- */
 .play {
   display: grid; align-items: center;
@@ -282,7 +293,7 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
   gap: clamp(32px, 6vw, 88px);
 }
 .desk__fig { margin: 0; min-width: 0; max-width: 440px; }
-.desk__photo { aspect-ratio: 480 / 570; }
+.desk__photo { aspect-ratio: 1 / 1; }
 .pin {
   position: absolute; transform: translateY(-50%);
   display: inline-flex; align-items: center; gap: 7px;
@@ -304,7 +315,7 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 
 /* ---------- 맨 아래 ---------- */
 .foot { border-top: 1px solid var(--line); padding-block: 34px 44px; color: var(--muted); font-size: 0.9rem; }
-.foot__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 32px; }
+.foot__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 32px; }
 .foot strong { color: var(--ink); font: 800 1rem/1.4 var(--font-display); letter-spacing: -0.03em; display: block; }
 .foot__credits { font: 400 0.8125rem/1.7 var(--font-mono); max-width: 34em; }
 
@@ -336,6 +347,7 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     <nav class="nav" aria-label="이 페이지 안에서 이동">
       <a href="#how" data-go="how">세 단계</a>
       <a href="#draw" data-go="draw">따라 그리기</a>
+      <a href="#software" data-go="software">작동 원리</a>
       <a href="#write" data-go="write">글씨 써 보기</a>
       <a href="#desk" data-go="desk">책상 위</a>
     </nav>
@@ -404,23 +416,37 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
       <div class="sec-head">
         <p class="kicker">그림도 됩니다</p>
         <h2>그림을 놓으면 따라 그립니다</h2>
-        <p class="sec-lead">수학 문제인지 그림인지는 AI가 먼저 구분합니다. 그림이면 사진에서 선만 골라내 한 획씩 옮겨 그립니다.</p>
+        <p class="sec-lead">수학 문제인지 그림인지는 AI가 먼저 구분합니다. 그림이면 선으로 바꾼 뒤, 로봇이 닿는 범위 안에서 가장 크게 옮겨 그립니다.</p>
       </div>
-      <div class="pair">
+      <div class="duo">
         <figure>
-          <div class="media media--wide"><img src="media/shapes.jpg" width="864" height="486" alt="동그라미, 세모, 네모를 그린 종이를 카메라 앞에 들어 보이는 손" loading="lazy"></div>
-          <figcaption class="cap"><span>보여준 그림</span></figcaption>
-        </figure>
-        <svg class="pair__arrow" viewBox="0 0 44 24" aria-hidden="true"><path d="M3 12 C 12 9, 22 14, 38 12 M30 5 L39 12 L30 19"/></svg>
-        <figure>
-          <div class="media media--wide media--low">
-            <video id="v-draw" data-loop src="media/draw.mp4" poster="media/draw-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="로봇팔이 화이트보드에 동그라미, 세모, 네모를 따라 그리는 영상"></video>
+          <div class="media media--wide">
+            <video id="v-draw" data-loop src="media/house.mp4" poster="media/house-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="로봇팔이 종이에 그려진 집을 화이트보드에 따라 그리는 영상"></video>
             <button class="vbtn" type="button" data-for="v-draw" data-state="playing" aria-label="영상 멈춤"></button>
           </div>
-          <figcaption class="cap"><span>로봇이 그린 그림</span><span>실제 촬영</span><span>약 8.5배속</span></figcaption>
+          <figcaption class="cap"><span>그리는 과정</span><span>실제 촬영</span><span>6배속</span></figcaption>
+        </figure>
+        <figure>
+          <div class="media media--wide"><img src="media/house-result.jpg" width="1280" height="720" alt="왼쪽 종이에 사람이 그린 집, 오른쪽 화이트보드에 로봇이 따라 그린 집" loading="lazy"></div>
+          <figcaption class="cap"><span>왼쪽이 보여준 그림</span><span>오른쪽이 로봇이 그린 그림</span></figcaption>
         </figure>
       </div>
-      <p class="note">아직은 선이 삐뚤고, 이 영상에서는 네모 한 변을 놓쳤습니다. 더 곧게, 더 크게 그리도록 고치는 중입니다.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="software">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">작동 원리</p>
+        <h2>사진 한 장이 펜의 움직임이 되기까지</h2>
+        <p class="sec-lead">프로그램 하나가 네 단계를 차례로 실행합니다. AI는 한 문제에 한 번만 부릅니다.</p>
+      </div>
+      <ol class="flow">
+        <li><span class="flow__n">01</span><h3>촬영</h3><p>깊이 카메라로 책상을 1280×720 사진으로 찍습니다. 세 장을 평균해 흔들림을 줄입니다.</p></li>
+        <li><span class="flow__n">02</span><h3>판단</h3><p>사진과 지시를 Gemini에 한 번 보냅니다. 수학이면 풀이와 답을, 그림이면 위치와 25획 이내의 선화를 받습니다.</p></li>
+        <li><span class="flow__n">03</span><h3>계획</h3><p>답은 한 획 글꼴로, 그림은 기울기를 바로잡아 선으로 바꿉니다. 모든 점이 로봇에 닿는지 미리 계산합니다.</p></li>
+        <li><span class="flow__n">04</span><h3>실행</h3><p>이동마다 안전 범위를 검사하며 펜을 내리고, 긋고, 듭니다. 도착 위치는 전부 기록으로 남깁니다.</p></li>
+      </ol>
     </div>
   </section>
 
@@ -472,32 +498,20 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     <div class="wrap desk">
       <figure class="desk__fig">
         <div class="media desk__photo">
-          <img src="media/desk.jpg" width="480" height="570" alt="위에서 내려다본 초록 책상. 문제지, 화이트보드, 파란 보드마카를 쥔 로봇팔이 놓여 있다" loading="lazy">
-          <span class="pin" style="left:47%;top:31%">문제지</span>
-          <span class="pin" style="left:31%;top:49%">화이트보드</span>
-          <span class="pin" style="left:73%;top:68%">보드마카</span>
-          <span class="pin" style="left:80%;top:89%">로봇팔</span>
+          <img src="media/setup.jpg" width="900" height="900" alt="흰 책상 위의 로봇팔, 화이트보드, 수학 문제지, 그리고 위에서 내려다보는 카메라 거치대" loading="lazy">
         </div>
-        <figcaption class="cap"><span>로봇의 카메라가 찍은 책상</span></figcaption>
+        <figcaption class="cap"><span>실제 구성</span></figcaption>
       </figure>
       <div class="desk__text">
         <p class="kicker">준비물</p>
         <h2>책상 위에 있는 것은 이게 전부입니다</h2>
-        <p>로봇팔 하나, 카메라 한 대, 화이트보드 한 장, 보드마카 한 자루. 이 사진도 로봇의 카메라가 찍었습니다.</p>
+        <p>로봇팔 하나, 카메라 한 대, 화이트보드 한 장, 펜 한 자루. 카메라는 거치대 위에서 책상을 내려다봅니다.</p>
         <dl class="facts">
           <div><dt>글자 높이</dt><dd>3 cm</dd></div>
           <div><dt>평균 위치 오차</dt><dd>2 mm</dd></div>
           <div><dt>답 한 줄 쓰는 시간</dt><dd>1분 46초</dd></div>
           <div><dt>AI가 생각하는 시간</dt><dd>10~20초</dd></div>
         </dl>
-        <div class="learning">
-          <h3>아직 배우는 중</h3>
-          <ul>
-            <li>선이 조금 떨립니다.</li>
-            <li>그림은 아직 작게 그립니다.</li>
-            <li>쓸 줄 아는 글자는 숫자와 x, y, 기호를 합쳐 22자입니다.</li>
-          </ul>
-        </div>
       </div>
     </div>
   </section>
@@ -505,8 +519,8 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <p><strong>라쿤봇 AI 선생님</strong>영상과 사진은 2026년 11월에 직접 찍었습니다.</p>
-    <p class="foot__credits">로봇팔 라쿤봇 · 카메라 Intel RealSense D455 · 풀이 Google Gemini · 선 찾기 OpenCV</p>
+    <p class="foot__brand"><span class="brand__cap" aria-hidden="true"></span>라쿤봇 AI 선생님<!--TEAM--></p>
+    <p class="foot__credits">Raccoon Robot · Intel RealSense D455 · Google Gemini · OpenCV</p>
   </div>
 </footer>
 </div>
