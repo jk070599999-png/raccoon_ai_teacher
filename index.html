@@ -217,14 +217,8 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); }
 .duo figure { margin: 0; min-width: 0; }
-.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 clamp(20px, 3vw, 40px); }
-.flow li { min-width: 0; padding-top: 20px; border-top: 2px solid var(--ink); }
-.flow__n { font: 500 0.8125rem/1 var(--font-mono); color: var(--marker); }
-.flow h3 { margin-top: 12px; font-size: 1.3rem; }
-.flow p { margin-top: 10px; color: var(--muted); font-size: 0.98rem; }
 .foot__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 800 1rem/1.4 var(--font-display); letter-spacing: -0.03em; }
-@media (max-width: 900px) { .duo { grid-template-columns: minmax(0, 1fr); max-width: 640px; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 24px; } }
-@media (max-width: 520px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .duo { grid-template-columns: minmax(0, 1fr); max-width: 640px; } }
 
 /* ---------- 직접 써 보기 ---------- */
 .play {
@@ -292,8 +286,8 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: clamp(32px, 6vw, 88px);
 }
-.desk__fig { margin: 0; min-width: 0; max-width: 440px; }
-.desk__photo { aspect-ratio: 1 / 1; }
+.desk__fig { margin: 0; min-width: 0; max-width: 500px; }
+.desk__photo { aspect-ratio: 1090 / 1340; }
 .pin {
   position: absolute; transform: translateY(-50%);
   display: inline-flex; align-items: center; gap: 7px;
@@ -312,6 +306,53 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 .learning h3 { font-size: 1.15rem; letter-spacing: -0.02em; }
 .learning ul { margin: 10px 0 0; padding-left: 1.15em; color: var(--muted); font-size: 1rem; }
 .learning li + li { margin-top: 2px; }
+
+/* ---------- 전체 흐름 ---------- */
+.pipe { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 30px; }
+.pipe > li { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.pipe > li + li::before { content: ""; position: absolute; left: -23px; top: calc(50% - 1px); width: 15px; height: 2px; background: var(--muted); }
+.pipe > li + li::after {
+  content: ""; position: absolute; left: -15px; top: calc(50% - 5px); width: 8px; height: 8px;
+  border-top: 2px solid var(--muted); border-right: 2px solid var(--muted); transform: rotate(45deg);
+}
+.node {
+  flex: 1; display: flex; flex-direction: column; gap: 6px;
+  padding: 16px 14px 14px; border-radius: 14px;
+  border: 1.5px solid var(--line-strong); background: var(--paper);
+}
+.node__k { font: 500 0.75rem/1 var(--font-mono); letter-spacing: 0.04em; color: var(--marker); }
+.node h3 { font-size: 1.08rem; letter-spacing: -0.02em; }
+.node p { font-size: 0.875rem; line-height: 1.55; color: var(--muted); }
+.node code { margin-top: auto; padding-top: 8px; font: 400 0.6875rem/1.3 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.node--end { background: var(--marker); border-color: var(--marker); }
+.node--end h3, .node--end p, .node--end code, .node--end .node__k { color: var(--on-marker); }
+@media (max-width: 1000px) {
+  .pipe { grid-template-columns: minmax(0, 1fr); max-width: 460px; gap: 34px; }
+  .pipe > li + li::before { left: calc(50% - 1px); top: -27px; width: 2px; height: 17px; }
+  .pipe > li + li::after { left: calc(50% - 5px); top: -18px; transform: rotate(135deg); }
+  .pipe__split { flex-direction: row !important; }
+  .node code { padding-top: 4px; }
+}
+
+/* ---------- 하드웨어 / 소프트웨어 ---------- */
+.spec { margin: 30px 0 0; }
+.spec > div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 2px 20px; padding-block: 15px; border-top: 1px solid var(--line-strong); }
+.spec dt { font: 800 1rem/1.6 var(--font-display); letter-spacing: -0.02em; }
+.spec dd { margin: 0; color: var(--muted); font-size: 0.98rem; line-height: 1.65; }
+.tech { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px clamp(22px, 3vw, 40px); }
+.tech li { min-width: 0; display: flex; flex-direction: column; padding-top: 18px; border-top: 2px solid var(--ink); }
+.tech h3 { font-size: 1.25rem; }
+.tech p { margin-top: 10px; color: var(--muted); font-size: 0.98rem; }
+.tech__m { margin-top: auto; padding-top: 14px; font: 500 0.8125rem/1.4 var(--font-mono); word-spacing: -0.2em; color: var(--marker); font-variant-numeric: tabular-nums; }
+.facts--wide { max-width: none; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(44px, 6vw, 72px); }
+@media (max-width: 900px) {
+  .tech { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts--wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .tech { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .spec > div { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* ---------- 맨 아래 ---------- */
 .foot { border-top: 1px solid var(--line); padding-block: 34px 44px; color: var(--muted); font-size: 0.9rem; }
@@ -347,9 +388,10 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     <nav class="nav" aria-label="이 페이지 안에서 이동">
       <a href="#how" data-go="how">세 단계</a>
       <a href="#draw" data-go="draw">따라 그리기</a>
-      <a href="#software" data-go="software">작동 원리</a>
-      <a href="#write" data-go="write">글씨 써 보기</a>
-      <a href="#desk" data-go="desk">책상 위</a>
+      <a href="#write" data-go="write">써 보기</a>
+      <a href="#flow" data-go="flow">전체 흐름</a>
+      <a href="#hardware" data-go="hardware">하드웨어</a>
+      <a href="#software" data-go="software">소프트웨어</a>
     </nav>
   </div>
 </header>
@@ -400,12 +442,12 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
               <li class="solve__ans">x = 1, 2, 3</li>
             </ol>
           </div>
-          <p>AI가 식을 읽고 풀이와 답을 만듭니다. 10~20초 걸립니다.</p>
+          <p>AI가 식을 읽고 풀이와 답을 만듭니다. 10초 남짓 걸립니다.</p>
         </li>
         <li class="step">
           <div class="step__head"><span class="step__n">3</span><h3>쓴다</h3></div>
           <div class="step__media"><img src="media/answer.jpg" width="800" height="450" alt="화이트보드에 파란 보드마카로 적힌 x=1,2,3 과 그 위의 로봇 펜" loading="lazy"></div>
-          <p>로봇팔이 한 획씩 답을 씁니다. 3 cm 글씨 일곱 자에 1분 46초.</p>
+          <p>로봇팔이 한 획씩 답을 씁니다. 3 cm 글씨 일곱 자에 약 1분 45초.</p>
         </li>
       </ol>
     </div>
@@ -431,22 +473,6 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
           <figcaption class="cap"><span>왼쪽이 보여준 그림</span><span>오른쪽이 로봇이 그린 그림</span></figcaption>
         </figure>
       </div>
-    </div>
-  </section>
-
-  <section class="sec" id="software">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="kicker">작동 원리</p>
-        <h2>사진 한 장이 펜의 움직임이 되기까지</h2>
-        <p class="sec-lead">프로그램 하나가 네 단계를 차례로 실행합니다. AI는 한 문제에 한 번만 부릅니다.</p>
-      </div>
-      <ol class="flow">
-        <li><span class="flow__n">01</span><h3>촬영</h3><p>깊이 카메라로 책상을 1280×720 사진으로 찍습니다. 세 장을 평균해 흔들림을 줄입니다.</p></li>
-        <li><span class="flow__n">02</span><h3>판단</h3><p>사진과 지시를 Gemini에 한 번 보냅니다. 수학이면 풀이와 답을, 그림이면 위치와 25획 이내의 선화를 받습니다.</p></li>
-        <li><span class="flow__n">03</span><h3>계획</h3><p>답은 한 획 글꼴로, 그림은 기울기를 바로잡아 선으로 바꿉니다. 모든 점이 로봇에 닿는지 미리 계산합니다.</p></li>
-        <li><span class="flow__n">04</span><h3>실행</h3><p>이동마다 안전 범위를 검사하며 펜을 내리고, 긋고, 듭니다. 도착 위치는 전부 기록으로 남깁니다.</p></li>
-      </ol>
     </div>
   </section>
 
@@ -494,25 +520,76 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     </div>
   </section>
 
-  <section class="sec" id="desk">
+  <section class="sec" id="flow">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">전체 흐름</p>
+        <h2>사진 한 장이 펜의 움직임이 되기까지</h2>
+        <p class="sec-lead">사진 한 장과 AI 호출 한 번으로 시작해 여섯 단계를 거칩니다. 실행하는 동안 사람은 손대지 않습니다.</p>
+      </div>
+      <ol class="pipe">
+        <li><div class="node"><span class="node__k">01</span><h3>촬영</h3><p>깊이 카메라가 책상을 사진 한 장으로 찍습니다.</p><code>robot_cam.py</code></div></li>
+        <li><div class="node"><span class="node__k">02</span><h3>판단</h3><p>Gemini가 수학인지 그림인지 정하고, 풀이나 선화를 돌려줍니다.</p><code>teacher.py</code></div></li>
+        <li class="pipe__split">
+          <div class="node"><span class="node__k">03 수학</span><h3>답을 획으로</h3><p>답을 각진 글꼴의 선으로 바꿉니다.</p><code>math_teacher.py</code></div>
+          <div class="node"><span class="node__k">03 그림</span><h3>선을 다듬기</h3><p>기울기를 펴고 크기와 자리를 정합니다.</p><code>art_teacher.py</code></div>
+        </li>
+        <li><div class="node"><span class="node__k">04</span><h3>획 실행</h3><p>선을 펜 내리기, 긋기, 떼기 동작으로 바꿉니다.</p><code>pen.py</code></div></li>
+        <li><div class="node"><span class="node__k">05</span><h3>안전 검사</h3><p>이동마다 범위와 도달 여부를 먼저 확인합니다.</p><code>raccoon_safe.py</code></div></li>
+        <li><div class="node node--end"><span class="node__k">06</span><h3>쓰기</h3><p>로봇팔이 보드마카로 화이트보드에 씁니다.</p><code>라쿤봇</code></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec" id="hardware">
     <div class="wrap desk">
       <figure class="desk__fig">
         <div class="media desk__photo">
-          <img src="media/setup.jpg" width="900" height="900" alt="흰 책상 위의 로봇팔, 화이트보드, 수학 문제지, 그리고 위에서 내려다보는 카메라 거치대" loading="lazy">
+          <img src="media/setup.jpg" width="1090" height="1340" alt="실험 환경. 왼쪽 위 거치대에 달린 깊이 카메라가 흰 책상을 내려다보고, 책상 위에 로봇팔, 화이트보드, 수학 문제지가 놓여 있다" loading="lazy">
+          <span class="pin" style="left:13.5%;top:8.5%">깊이 카메라</span>
+          <span class="pin" style="left:73%;top:43%">문제지</span>
+          <span class="pin" style="left:72%;top:63%">로봇팔</span>
+          <span class="pin" style="left:50%;top:76%">화이트보드</span>
         </div>
-        <figcaption class="cap"><span>실제 구성</span></figcaption>
+        <figcaption class="cap"><span>실험 환경</span><span>실제 촬영</span></figcaption>
       </figure>
       <div class="desk__text">
-        <p class="kicker">준비물</p>
-        <h2>책상 위에 있는 것은 이게 전부입니다</h2>
-        <p>로봇팔 하나, 카메라 한 대, 화이트보드 한 장, 펜 한 자루. 카메라는 거치대 위에서 책상을 내려다봅니다.</p>
-        <dl class="facts">
-          <div><dt>글자 높이</dt><dd>3 cm</dd></div>
-          <div><dt>평균 위치 오차</dt><dd>2 mm</dd></div>
-          <div><dt>답 한 줄 쓰는 시간</dt><dd>1분 46초</dd></div>
-          <div><dt>AI가 생각하는 시간</dt><dd>10~20초</dd></div>
+        <p class="kicker">하드웨어</p>
+        <h2>카메라까지가 하나의 실험 환경입니다</h2>
+        <p>로봇팔, 깊이 카메라, 화이트보드, 보드마카. 전부 책상 하나에 올라갑니다.</p>
+        <dl class="spec">
+          <div><dt>로봇팔</dt><dd>Robomation 라쿤봇. 관절 네 개와 집게로 된 교육용 로봇팔이고, 팔 마디는 약 10 cm입니다.</dd></div>
+          <div><dt>카메라</dt><dd>Intel RealSense D455. 색과 깊이를 함께 찍고, 거치대 위에서 책상을 내려다봅니다.</dd></div>
+          <div><dt>펜 고정</dt><dd>집게를 앞으로 눕히고 마커를 세워 끼웁니다. 멈춤 턱과 홀더를 달아, 누를 때 펜 끝이 2~6 mm 밀리던 문제를 없앴습니다.</dd></div>
+          <div><dt>쓰는 면</dt><dd>화이트보드. 깊이 카메라로 높이를 재서 책상 위 12 mm로 맞췄습니다.</dd></div>
+          <div><dt>위치 맞춤</dt><dd>마커를 붙인 블록을 로봇이 쥐고 18곳을 돌며 카메라와 로봇의 좌표를 맞춥니다. 오차는 1~1.5 mm입니다.</dd></div>
+          <div><dt>닿는 범위</dt><dd>손끝은 로봇 앞 12~23 cm 띠 안에서 움직입니다. 그림은 한 변 약 13 cm까지 그립니다.</dd></div>
         </dl>
       </div>
+    </div>
+  </section>
+
+  <section class="sec" id="software">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">소프트웨어</p>
+        <h2>로봇의 한계를 재고, 계산으로 메웠습니다</h2>
+        <p class="sec-lead">이 로봇은 움직일 때마다 2~3 mm씩 어긋나고, 관절이 따로 움직여 펜이 뜨기도 합니다. 문제를 하나씩 재서 소프트웨어로 보완했습니다.</p>
+      </div>
+      <ul class="tech">
+        <li><h3>AI 호출은 한 번</h3><p>사진과 지시를 Gemini에 한 번 보내면, 할 일의 종류와 풀이 또는 선화가 함께 돌아옵니다.</p><span class="tech__m">응답 10~14초</span></li>
+        <li><h3>각진 글꼴</h3><p>곡선을 잘게 나눠 그리면 오차가 쌓입니다. 긴 직선만 쓰는 글꼴을 만들어 쓰는 시간을 절반으로 줄였습니다.</p><span class="tech__m">209.7초 → 103.5초</span></li>
+        <li><h3>기울기 바로잡기</h3><p>카메라가 종이를 비스듬히 보면 그림이 한쪽으로 기웁니다. 세로선과 가로선이 똑바로 서도록 그림 전체를 폅니다.</p><span class="tech__m">기울기 12~15° → 0°</span></li>
+        <li><h3>크기와 자리 찾기</h3><p>모든 점이 닿는지 역기구학으로 미리 계산해, 가장 크게 그릴 수 있는 자리를 고릅니다.</p><span class="tech__m">한 변 7 cm → 13 cm</span></li>
+        <li><h3>펜이 뜨지 않게</h3><p>로봇 쪽으로 다가오는 선에서는 펜이 떠서 점선이 됐습니다. 목표를 0.5 mm씩 잘게 보내 해결했습니다.</p><span class="tech__m">뜨는 높이 13 mm → 0.47 mm 이하</span></li>
+        <li><h3>안전 장치</h3><p>모든 이동은 범위와 도달 여부 검사를 통과해야 하고, 속도에는 상한이 있습니다. 기본 실행은 로봇을 움직이지 않는 미리보기입니다.</p><span class="tech__m">속도 상한 30 / 100</span></li>
+      </ul>
+      <dl class="facts facts--wide" aria-label="마지막 집 그림에서 잰 값">
+        <div><dt>집 그림 크기</dt><dd>12.0 × 10.9 cm</dd></div>
+        <div><dt>그리는 시간</dt><dd>105초</dd></div>
+        <div><dt>평균 위치 오차</dt><dd>2.1 mm</dd></div>
+        <div><dt>계획한 선 중 그려진 비율</dt><dd>98.3%</dd></div>
+      </dl>
     </div>
   </section>
 </main>
