@@ -6,556 +6,500 @@
 <meta name="description" content="수학 문제를 보여주면 풀어서 화이트보드에 써 주는 책상 위 로봇팔, 라쿤봇 AI 선생님">
 <style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>라쿤봇 AI 선생님</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
-/* 레이아웃: 화이트보드 흰 바탕에 왼쪽 정렬 본문. 가운데 한 번 책상 매트 초록 띠가 지나가고,
-   직접 써 보는 칸만 검은 테 화이트보드로 그린다. 강조색은 보드마카 파랑 하나. */
+/* 레이아웃: 색 블록이 위에서 아래로 바뀌는 한 장짜리 페이지. 보드마카 파랑 / 형광펜 노랑 / 먹색 세 가지 면에
+   굵은 먹선 테두리와 딱 떨어지는 그림자(스티커 느낌). 첫 화면에서 화면 속 로봇팔이 실제 글꼴로 글씨를 쓴다.
+   한 가지 모습으로만 만든다 (밝은/어두운 테마를 나누지 않음: 색 블록 자체가 디자인). */
 :root {
-  --board: #f5f7f6;        /* 화이트보드 바탕 */
-  --ink: #131c18;          /* 본문 */
-  --muted: #55655e;
-  --marker: #1b5bd0;       /* 보드마카 파랑 */
-  --on-marker: #ffffff;
-  --desk: #1c4433;         /* 책상 매트 초록 */
-  --desk-ink: #eef4f0;
-  --desk-muted: #b4c8bd;
-  --frame: #181c1b;        /* 화이트보드 테 */
-  --line: #dde3e0;
-  --line-strong: #c2ccc7;
+  --blue: #1a47e8;         /* 보드마카 파랑 */
+  --yellow: #ffd60a;       /* 형광펜 노랑 */
+  --ink: #0c1222;          /* 먹색 */
+  --ink-2: #19223a;
+  --ink-3: #2b3655;
   --paper: #ffffff;
-  --sheet: #ffffff;        /* 종이 (어두운 화면에서도 종이는 밝다) */
-  --sheet-ink: #131c18;
-  --sheet-muted: #5d6a64;
-  --sheet-marker: #1b5bd0;
-  --wb: #ffffff;           /* 화이트보드 면 */
-  --wb-ink: #1b5bd0;
-  --wb-faint: #b9c7ea;
-  --wb-label: #7b8794;
-  --pin-bg: rgba(15, 22, 19, 0.84);
-  --pin-fg: #ffffff;
-  --shadow: 0 34px 60px -36px rgba(19, 28, 24, 0.45);
-  --font-display: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --mist: #eef2fb;         /* 옅은 파랑 바탕 */
+  --line: #d6deee;
+  --muted: #535d78;
+  --on-dark: #f3f6ff;
+  --on-dark-muted: #aab6d6;
+  --on-blue-muted: #d3ddff;
+  --red: #ff5b3a;
+  --green: #18b26b;
+  --font-display: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
   --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
-  --font-mono: "IBM Plex Mono", "IBM Plex Sans KR", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-mono: "IBM Plex Mono", "IBM Plex Sans KR", ui-monospace, Consolas, monospace;
+  --hard: 6px 6px 0 var(--ink);
+  color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --board: #0e1412; --ink: #e8eeeb; --muted: #97a8a0; --marker: #7aa8ff; --on-marker: #0b1220;
-    --desk: #173a2b; --desk-ink: #eaf2ed; --desk-muted: #a9c0b4; --frame: #39423e;
-    --line: #232d29; --line-strong: #34403b; --paper: #161d1a;
-    --sheet: #eef1f0; --sheet-ink: #131c18; --sheet-muted: #5d6a64; --sheet-marker: #1b5bd0;
-    --wb: #eef1f0; --wb-ink: #1b5bd0; --wb-faint: #a9b9e2; --wb-label: #6f7b88;
-    --pin-bg: rgba(8, 12, 10, 0.86); --pin-fg: #ffffff;
-    --shadow: 0 34px 60px -36px rgba(0, 0, 0, 0.9);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --board: #0e1412; --ink: #e8eeeb; --muted: #97a8a0; --marker: #7aa8ff; --on-marker: #0b1220;
-  --desk: #173a2b; --desk-ink: #eaf2ed; --desk-muted: #a9c0b4; --frame: #39423e;
-  --line: #232d29; --line-strong: #34403b; --paper: #161d1a;
-  --sheet: #eef1f0; --sheet-ink: #131c18; --sheet-muted: #5d6a64; --sheet-marker: #1b5bd0;
-  --wb: #eef1f0; --wb-ink: #1b5bd0; --wb-faint: #a9b9e2; --wb-label: #6f7b88;
-  --pin-bg: rgba(8, 12, 10, 0.86); --pin-fg: #ffffff;
-  --shadow: 0 34px 60px -36px rgba(0, 0, 0, 0.9);
-  color-scheme: dark;
-}
-
 *, *::before, *::after { box-sizing: border-box; }
 body {
-  background: var(--board);
+  background: var(--paper);
   color: var(--ink);
   font: 400 17px/1.7 var(--font-body);
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 img, video, svg { display: block; max-width: 100%; }
-p { margin: 0; }
+p, h1, h2, h3, figure, dl, dd, ol, ul { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
 a { color: inherit; }
-:focus-visible { outline: 3px solid var(--marker); outline-offset: 3px; border-radius: 6px; }
+button, input { font: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 8px; }
+.on-light :focus-visible { outline-color: var(--blue); }
 
 .wrap {
-  max-width: 1120px;
-  margin-inline: auto;
+  max-width: 1180px; margin-inline: auto;
   padding-left: max(20px, env(safe-area-inset-left, 0px));
   padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
+.sec { padding-block: clamp(68px, 9vw, 124px); }
+.bg-mist { background: var(--mist); }
+.bg-ink { background: var(--ink); color: var(--on-dark); }
+.bg-blue { background: var(--blue); color: var(--paper); }
+.bg-yellow { background: var(--yellow); }
 
-/* ---------- 글자 ---------- */
-h1, h2, h3 { font-family: var(--font-display); font-weight: 800; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(3rem, 7.4vw, 5.4rem); line-height: 1.07; letter-spacing: -0.05em; }
-h2 { font-size: clamp(1.85rem, 3.7vw, 2.75rem); line-height: 1.2; letter-spacing: -0.04em; }
-h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
-.kicker {
-  font: 500 0.8125rem/1.4 var(--font-mono);
-  letter-spacing: 0.04em;
-  word-spacing: -0.2em;
-  color: var(--muted);
-  margin-bottom: 14px;
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; }
+h1 { font-size: clamp(3.3rem, 8.4vw, 6.6rem); line-height: 1.08; }
+h2 { font-size: clamp(2.1rem, 4.7vw, 3.6rem); line-height: 1.16; }
+h3 { font-size: 1.5rem; line-height: 1.25; }
+.tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 600 0.8125rem/1 var(--font-mono); letter-spacing: 0.06em; word-spacing: -0.2em;
+  padding: 9px 13px; border-radius: 999px;
+  background: var(--yellow); color: var(--ink); border: 2px solid var(--ink);
 }
-.sec-head { max-width: 38em; display: grid; gap: 0; margin-bottom: clamp(30px, 4.4vw, 52px); }
-.sec-lead { margin-top: 16px; font-size: 1.08rem; color: var(--muted); max-width: 34em; }
-.cap {
-  display: flex; flex-wrap: wrap; gap: 2px 10px;
-  margin-top: 14px; padding-inline: 2px;
-  font: 400 0.8125rem/1.6 var(--font-mono);
-  word-spacing: -0.2em;
-  color: var(--muted);
-}
-.cap span + span::before { content: "·"; margin-right: 10px; opacity: 0.6; }
+.tag--ghost { background: transparent; color: var(--yellow); border-color: var(--yellow); }
+.head { display: grid; gap: 18px; justify-items: start; max-width: 44em; margin-bottom: clamp(34px, 5vw, 60px); }
+.head p:not(.tag) { font-size: 1.1rem; color: var(--muted); max-width: 33em; }
+.bg-ink .head p:not(.tag) { color: var(--on-dark-muted); }
+.bg-blue .head p:not(.tag) { color: var(--on-blue-muted); }
 
-/* ---------- 맨 위 ---------- */
-.top { padding-block: 22px; }
-.top__in { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
-.brand {
-  display: inline-flex; align-items: center; gap: 10px;
-  font: 800 1.05rem/1 var(--font-display); letter-spacing: -0.03em;
-  text-decoration: none;
+/* 굵은 먹선 + 딱 떨어지는 그림자 */
+.sticker { background: var(--paper); color: var(--ink); border: 2.5px solid var(--ink); border-radius: 22px; box-shadow: var(--hard); }
+.frame { position: relative; overflow: hidden; border: 2.5px solid var(--ink); border-radius: 22px; background: var(--line); }
+.frame > img, .frame > video { width: 100%; height: 100%; object-fit: cover; }
+.bg-ink .frame { border-color: var(--on-dark); }
+.badge {
+  position: absolute; left: 12px; top: 12px;
+  font: 600 0.75rem/1 var(--font-mono); word-spacing: -0.2em;
+  padding: 7px 10px; border-radius: 999px;
+  background: var(--ink); color: var(--paper);
+  display: inline-flex; align-items: center; gap: 7px;
 }
-.brand__cap { width: 13px; height: 13px; border-radius: 50%; background: var(--marker); }
-.nav { display: flex; flex-wrap: wrap; gap: 2px; margin-right: -12px; }
-.nav a {
-  font: 500 0.92rem/1 var(--font-body); color: var(--muted);
-  text-decoration: none; padding: 10px 12px; border-radius: 999px;
-}
-.nav a:hover { color: var(--ink); background: var(--line); }
-@media (max-width: 620px) { .nav { display: none; } }
-
-/* ---------- 첫 화면 ---------- */
-.hero { padding-block: clamp(20px, 4vw, 56px) clamp(60px, 8vw, 108px); }
-.hero__in {
-  display: grid; align-items: center;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  gap: clamp(36px, 6vw, 84px);
-}
-.hero__text { min-width: 0; }
-.hero .kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-.hero .kicker::before { content: ""; width: 26px; height: 2px; background: var(--marker); border-radius: 2px; }
-.underlined { position: relative; display: inline-block; color: var(--marker); }
-.underlined svg {
-  position: absolute; left: -2%; right: -2%; bottom: -0.16em;
-  width: 104%; height: 0.24em; overflow: visible;
-}
-.underlined path {
-  fill: none; stroke: var(--marker); stroke-width: 5; stroke-linecap: round;
-  stroke-dasharray: 100; stroke-dashoffset: 0;
-}
-.lead { margin-top: 30px; font-size: clamp(1.1rem, 1.55vw, 1.27rem); line-height: 1.75; color: var(--muted); max-width: 27em; }
-.cta { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: 600 1rem/1 var(--font-body);
-  padding: 16px 24px; border-radius: 999px;
-  border: 1.5px solid transparent; text-decoration: none; cursor: pointer;
-  transition: transform 0.15s ease;
-}
-.btn:hover { transform: translateY(-1px); }
-.btn--primary { background: var(--marker); color: var(--on-marker); }
-.btn--ghost { border-color: var(--line-strong); color: var(--ink); background: transparent; }
-
-.media { position: relative; overflow: hidden; border-radius: 22px; background: var(--line); }
-.media > img, .media > video { width: 100%; height: 100%; object-fit: cover; }
-.media--square { aspect-ratio: 1 / 1; box-shadow: var(--shadow); }
-.media--wide { aspect-ratio: 16 / 9; }
-.media--low > video { object-position: 50% 62%; }
+.badge--rec::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
 .vbtn {
-  position: absolute; right: 12px; bottom: 12px;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 0; cursor: pointer; padding: 0;
-  background: var(--pin-bg); color: var(--pin-fg);
+  position: absolute; right: 12px; bottom: 12px; width: 42px; height: 42px; border-radius: 50%;
+  border: 0; padding: 0; cursor: pointer; background: var(--ink); color: var(--paper);
   display: grid; place-items: center;
 }
-.vbtn::before {           /* 멈춤(두 줄) / 재생(세모) */
-  content: ""; width: 12px; height: 14px;
-  border-inline: 4px solid currentColor;
-}
-.vbtn[data-state="paused"]::before {
-  width: 0; height: 0;
-  border-block: 8px solid transparent; border-left: 13px solid currentColor; border-right: 0;
-  margin-left: 3px;
-}
+.vbtn::before { content: ""; width: 12px; height: 14px; border-inline: 4px solid currentColor; }
+.vbtn[data-state="paused"]::before { width: 0; height: 0; border-block: 8px solid transparent; border-left: 13px solid currentColor; border-right: 0; margin-left: 3px; }
 
-/* ---------- 세 단계 (책상 초록 띠) ---------- */
-.band { background: var(--desk); color: var(--desk-ink); padding-block: clamp(60px, 8.5vw, 112px); }
-.band .kicker, .band .sec-lead { color: var(--desk-muted); }
-.steps {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(24px, 3.4vw, 44px);
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: 700 1.02rem/1 var(--font-body); text-decoration: none; cursor: pointer;
+  padding: 17px 26px; border-radius: 999px; border: 2.5px solid var(--ink);
+  background: var(--yellow); color: var(--ink); box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.step { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
-.step__head { display: flex; align-items: baseline; gap: 12px; }
-.step__n { font: 500 0.95rem/1 var(--font-mono); color: var(--desk-muted); }
-.step__media { aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: var(--sheet); }
-.step__media img { width: 100%; height: 100%; object-fit: cover; }
-.step p { color: var(--desk-muted); font-size: 1rem; }
-.sheet {
-  color: var(--sheet-ink);
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 0 clamp(14px, 6%, 26px);
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn--white { background: var(--paper); }
+
+/* ---------- 첫 화면 ---------- */
+.hero { position: relative; overflow: hidden; background: var(--blue); color: var(--paper); }
+.hero::before {            /* 모눈 공책 */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 46px 46px;
 }
-.sheet__label { font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.06em; color: var(--sheet-muted); margin-bottom: 0.9em; }
-.solve { list-style: none; margin: 0; padding: 0; font: 400 clamp(0.8rem, 1.22vw, 0.98rem)/1.75 var(--font-mono); white-space: nowrap; }
-.solve sup { font-size: 0.68em; line-height: 0; }
-.solve__ans { color: var(--sheet-marker); font-weight: 500; }
+#doodles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#doodles path { fill: none; stroke: #ffffff; stroke-opacity: 0.2; stroke-width: 0.55; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.hero > .wrap { position: relative; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; padding-block: 22px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 400 1.25rem/1 var(--font-display); text-decoration: none; }
+.brand__cap { width: 16px; height: 16px; border-radius: 50%; background: var(--yellow); border: 2.5px solid var(--ink); }
+.nav { display: flex; flex-wrap: wrap; gap: 2px; margin-right: -12px; }
+.nav a { font: 600 0.95rem/1 var(--font-body); text-decoration: none; padding: 10px 12px; border-radius: 999px; color: var(--on-blue-muted); }
+.nav a:hover { color: var(--ink); background: var(--yellow); }
+@media (max-width: 760px) { .nav { display: none; } }
 
-/* ---------- 일반 구역 ---------- */
-.sec { padding-block: clamp(64px, 9vw, 120px); }
-.sec + .sec { padding-top: 0; }
-
-.pair {
+.hero__in {
   display: grid; align-items: center;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: clamp(14px, 2.4vw, 30px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.98fr);
+  gap: clamp(32px, 5vw, 72px);
+  padding-block: clamp(18px, 3.5vw, 48px) clamp(64px, 8vw, 110px);
 }
-.pair figure { margin: 0; min-width: 0; }
-.pair__arrow { color: var(--marker); width: 44px; align-self: center; margin-bottom: 36px; }
-.pair__arrow path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.note { margin-top: 30px; max-width: 36em; color: var(--muted); font-size: 1rem; }
+.hero__text { min-width: 0; display: grid; gap: 26px; justify-items: start; }
+.hero h1 em { font-style: normal; color: var(--yellow); position: relative; display: inline-block; }
+.hero h1 em svg { position: absolute; left: -3%; bottom: -0.2em; width: 106%; height: 0.26em; overflow: visible; }
+.hero h1 em path { fill: none; stroke: var(--paper); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 0; }
+.lead { font-size: clamp(1.1rem, 1.6vw, 1.3rem); line-height: 1.75; color: var(--on-blue-muted); max-width: 26em; }
+.lead b { color: var(--paper); font-weight: 600; }
+.cta { display: flex; flex-wrap: wrap; gap: 14px; }
 
-.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); }
-.duo figure { margin: 0; min-width: 0; }
-.foot__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 800 1rem/1.4 var(--font-display); letter-spacing: -0.03em; }
-@media (max-width: 900px) { .duo { grid-template-columns: minmax(0, 1fr); max-width: 640px; } }
-
-/* ---------- 직접 써 보기 ---------- */
-.play {
-  display: grid; align-items: center;
-  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-  gap: clamp(30px, 5vw, 72px);
-}
-.play__text { min-width: 0; }
-.play__text > p { margin-top: 16px; color: var(--muted); max-width: 30em; }
-.form { margin-top: 28px; display: grid; gap: 14px; }
-.form label { font: 500 0.8125rem/1 var(--font-mono); letter-spacing: 0.04em; color: var(--muted); }
-.field { display: flex; flex-wrap: wrap; gap: 10px; }
+/* 연습용 로봇 */
+.stage { min-width: 0; background: var(--ink); border: 2.5px solid var(--ink); border-radius: 30px; padding: clamp(12px, 1.6vw, 18px); box-shadow: 10px 10px 0 rgba(6, 12, 40, 0.45); }
+.stage__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; padding: 4px 6px 12px; font: 500 0.75rem/1.4 var(--font-mono); word-spacing: -0.2em; color: var(--on-dark-muted); }
+.stage__live { display: inline-flex; align-items: center; gap: 8px; color: var(--on-dark); }
+.stage__live::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+.stage__desk { background: var(--ink-2); border-radius: 20px; overflow: hidden; }
+#stage { width: 100%; height: auto; transition: transform 0.8s cubic-bezier(0.6, 0, 0.2, 1); }
+#stage.is-robot { transform: rotate(180deg); }
+.st-frame { fill: #c9d2e3; }
+.st-board { fill: #ffffff; }
+.ink { fill: none; stroke: var(--blue); stroke-width: 0.19; stroke-linecap: round; stroke-linejoin: round; }
+.hop { fill: none; stroke: #b7c4ea; stroke-width: 0.045; stroke-dasharray: 0.16 0.16; opacity: 0; }
+.arm-shadow { stroke: #000; stroke-opacity: 0.16; stroke-width: 1.5; stroke-linecap: round; }
+.arm-under { stroke: #9aa6c0; stroke-width: 1.42; stroke-linecap: round; fill: none; }
+.arm-over { stroke: #f6f8fc; stroke-width: 1.14; stroke-linecap: round; fill: none; }
+.arm-grip { stroke: #dfe5f0; stroke-width: 0.86; stroke-linecap: round; }
+.arm-plate { fill: #f6f8fc; stroke: #9aa6c0; stroke-width: 0.14; }
+.arm-motor { fill: #10141d; }
+.arm-hub { fill: #333c4f; }
+#a-cap { fill: var(--blue); stroke: #ffffff; stroke-width: 0.11; }
+#a-cap.is-up { fill: #5b83ff; }
+.console { display: grid; gap: 12px; padding: 14px 4px 4px; }
+.console label { font: 500 0.78rem/1 var(--font-mono); word-spacing: -0.2em; color: var(--on-dark-muted); }
+.field { display: flex; gap: 10px; }
 .field input {
-  flex: 1 1 11rem; min-width: 0;
-  font: 500 1.3rem/1 var(--font-mono);
-  padding: 14px 16px; border-radius: 14px;
-  border: 1.5px solid var(--line-strong);
-  background: var(--paper); color: var(--ink);
+  flex: 1 1 8rem; min-width: 0;
+  font: 500 1.3rem/1 var(--font-mono); padding: 14px 16px; border-radius: 14px;
+  background: var(--ink-2); color: var(--on-dark); border: 2px solid var(--ink-3);
 }
-.field .btn { padding: 14px 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip {
-  font: 400 0.875rem/1 var(--font-mono);
-  padding: 9px 12px; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--line-strong); background: transparent; color: var(--ink);
-}
-.chip:hover { border-color: var(--marker); color: var(--marker); }
-.hint { font-size: 0.9rem; color: var(--marker); }
+.field input:focus-visible { outline: 3px solid var(--yellow); outline-offset: 0; border-color: var(--yellow); }
+.field .btn { padding: 14px 22px; box-shadow: none; border-color: var(--yellow); }
+.field .btn:hover { transform: none; box-shadow: none; filter: brightness(1.06); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chip { font: 500 0.85rem/1 var(--font-mono); padding: 9px 12px; border-radius: 999px; cursor: pointer; border: 1.5px solid var(--ink-3); background: transparent; color: var(--on-dark); }
+.chip:hover { border-color: var(--yellow); color: var(--yellow); }
+.seg { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 999px; background: var(--ink-2); }
+.seg__b { font: 600 0.82rem/1 var(--font-body); padding: 8px 12px; border-radius: 999px; border: 0; cursor: pointer; background: transparent; color: var(--on-dark-muted); }
+.seg__b[aria-pressed="true"] { background: var(--yellow); color: var(--ink); }
+.hint { font-size: 0.86rem; color: var(--yellow); }
 .hint:empty { display: none; }
-.seg { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--line); gap: 2px; justify-self: start; }
-.seg__b {
-  font: 500 0.9rem/1 var(--font-body);
-  padding: 10px 16px; border-radius: 999px; border: 0; cursor: pointer;
-  background: transparent; color: var(--muted);
-}
-.seg__b[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
-.play__board { min-width: 0; margin: 0; }
-.wbframe {
-  position: relative;
-  border: clamp(8px, 1.4vw, 14px) solid var(--frame);
-  border-radius: clamp(22px, 3vw, 34px);
-  background: var(--wb);
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.wbframe svg { width: 100%; height: 100%; }
-#wb-view { transform-origin: 50% 50%; transition: transform 0.7s cubic-bezier(0.6, 0, 0.2, 1); }
-#wb-view.is-robot { transform: rotate(180deg); }
-.ink { fill: none; stroke: var(--wb-ink); stroke-width: 0.17; stroke-linecap: round; stroke-linejoin: round; }
-.hop { fill: none; stroke: var(--wb-faint); stroke-width: 0.045; stroke-dasharray: 0.16 0.16; opacity: 0; }
-#wb-pen { fill: var(--wb-ink); stroke: var(--wb-ink); stroke-width: 0.06; opacity: 0; }
-#wb-pen.is-up { fill: var(--wb); }
-.wbside {
-  position: absolute; left: 0; right: 0; text-align: center; pointer-events: none;
-  font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.08em; color: var(--wb-label);
-}
-.wbside--top { top: 10px; }
-.wbside--bottom { bottom: 10px; }
-.readout { font-variant-numeric: tabular-nums; }
 
-/* ---------- 책상 위 ---------- */
-.desk {
-  display: grid; align-items: center;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: clamp(32px, 6vw, 88px);
-}
-.desk__fig { margin: 0; min-width: 0; max-width: 500px; }
-.desk__photo { aspect-ratio: 1090 / 1340; }
-.pin {
-  position: absolute; transform: translateY(-50%);
-  display: inline-flex; align-items: center; gap: 7px;
-  font: 500 0.75rem/1 var(--font-body); white-space: nowrap;
-  padding: 7px 10px 7px 8px; border-radius: 999px;
-  background: var(--pin-bg); color: var(--pin-fg);
-}
-.pin::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pin-fg); }
-.desk__text { min-width: 0; }
-.desk__text > p { margin-top: 16px; color: var(--muted); max-width: 31em; }
-.facts { margin: 34px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; max-width: 30em; }
-.facts div { padding-block: 14px; border-top: 1px solid var(--line-strong); }
-.facts dt { font-size: 0.9rem; color: var(--muted); }
-.facts dd { margin: 2px 0 0; font: 500 1.45rem/1.3 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.learning { margin-top: 30px; }
-.learning h3 { font-size: 1.15rem; letter-spacing: -0.02em; }
-.learning ul { margin: 10px 0 0; padding-left: 1.15em; color: var(--muted); font-size: 1rem; }
-.learning li + li { margin-top: 2px; }
+/* ---------- 세 단계 ---------- */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 2.8vw, 34px); }
+.step { min-width: 0; display: flex; flex-direction: column; padding: 18px 18px 24px; }
+.step__top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.num { width: 46px; height: 64px; flex: none; overflow: visible; }
+.num path { fill: none; stroke: var(--blue); stroke-width: 0.13; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.step__media { position: relative; aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; border: 2px solid var(--ink); background: var(--mist); }
+.step__media img, .step__media video { width: 100%; height: 100%; object-fit: cover; }
+.step__media video { object-position: 50% 62%; }
+.step > p { margin-top: 16px; color: var(--muted); font-size: 1rem; }
+.sheet { display: flex; flex-direction: column; justify-content: center; padding: 0 clamp(14px, 7%, 26px); background: var(--paper); }
+.sheet__label { font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.9em; }
+.solve { font: 400 clamp(0.8rem, 1.2vw, 0.98rem)/1.8 var(--font-mono); white-space: nowrap; }
+.solve sup { font-size: 0.68em; line-height: 0; }
+.solve__ans span { font-weight: 600; background: linear-gradient(transparent 52%, var(--yellow) 52%); padding: 0 3px; }
+
+/* ---------- 그림 ---------- */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 30px); }
+.duo figure { min-width: 0; }
+.duo .frame { aspect-ratio: 16 / 9; }
+.cap { margin-top: 12px; font: 400 0.8125rem/1.6 var(--font-mono); word-spacing: -0.2em; color: var(--on-dark-muted); }
+
+/* ---------- 숫자 띠 ---------- */
+.stats { padding-block: clamp(44px, 6vw, 72px); border-block: 2.5px solid var(--ink); }
+.stats__cap { font: 600 0.8125rem/1 var(--font-mono); letter-spacing: 0.06em; word-spacing: -0.2em; margin-bottom: 22px; }
+.stats dl { display: grid; grid-template-columns: 1.45fr 1fr 1fr 1.25fr; gap: 26px clamp(16px, 3vw, 40px); }
+.stats dl > div { min-width: 0; display: flex; flex-direction: column-reverse; gap: 6px; }
+.stats dt { font-weight: 600; font-size: 0.98rem; }
+.stats dd { font: 400 clamp(2rem, 4vw, 3.2rem)/1.05 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats dd small { font-size: 0.45em; margin-left: 0.14em; }
 
 /* ---------- 전체 흐름 ---------- */
-.pipe { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 30px; }
-.pipe > li { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
-.pipe > li + li::before { content: ""; position: absolute; left: -23px; top: calc(50% - 1px); width: 15px; height: 2px; background: var(--muted); }
-.pipe > li + li::after {
-  content: ""; position: absolute; left: -15px; top: calc(50% - 5px); width: 8px; height: 8px;
-  border-top: 2px solid var(--muted); border-right: 2px solid var(--muted); transform: rotate(45deg);
+.pipe { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 34px; }
+.pipe > li { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.pipe > li + li::before {           /* 흘러가는 점선 */
+  content: ""; position: absolute; left: -30px; top: calc(50% - 2px); width: 26px; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
 }
-.node {
-  flex: 1; display: flex; flex-direction: column; gap: 6px;
-  padding: 16px 14px 14px; border-radius: 14px;
-  border: 1.5px solid var(--line-strong); background: var(--paper);
-}
-.node__k { font: 500 0.75rem/1 var(--font-mono); letter-spacing: 0.04em; color: var(--marker); }
-.node h3 { font-size: 1.08rem; letter-spacing: -0.02em; }
+.node { flex: 1; display: flex; flex-direction: column; gap: 7px; padding: 16px 14px 14px; border-radius: 18px; border: 2.5px solid var(--ink); background: var(--paper); box-shadow: 4px 4px 0 var(--ink); }
+.node__ico { width: 40px; height: 40px; border-radius: 12px; background: var(--yellow); border: 2px solid var(--ink); display: grid; place-items: center; margin-bottom: 4px; }
+.node__ico svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.node__k { font: 600 0.72rem/1 var(--font-mono); letter-spacing: 0.05em; color: var(--blue); }
+.node h3 { font-size: 1.22rem; }
 .node p { font-size: 0.875rem; line-height: 1.55; color: var(--muted); }
-.node code { margin-top: auto; padding-top: 8px; font: 400 0.6875rem/1.3 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
-.node--end { background: var(--marker); border-color: var(--marker); }
-.node--end h3, .node--end p, .node--end code, .node--end .node__k { color: var(--on-marker); }
-@media (max-width: 1000px) {
-  .pipe { grid-template-columns: minmax(0, 1fr); max-width: 460px; gap: 34px; }
-  .pipe > li + li::before { left: calc(50% - 1px); top: -27px; width: 2px; height: 17px; }
-  .pipe > li + li::after { left: calc(50% - 5px); top: -18px; transform: rotate(135deg); }
-  .pipe__split { flex-direction: row !important; }
-  .node code { padding-top: 4px; }
-}
+.node code { margin-top: auto; padding-top: 8px; font: 500 0.6875rem/1.3 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.node--end { background: var(--blue); }
+.node--end h3, .node--end p, .node--end code { color: var(--paper); }
+.node--end .node__k { color: var(--yellow); }
 
-/* ---------- 하드웨어 / 소프트웨어 ---------- */
-.spec { margin: 30px 0 0; }
-.spec > div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 2px 20px; padding-block: 15px; border-top: 1px solid var(--line-strong); }
-.spec dt { font: 800 1rem/1.6 var(--font-display); letter-spacing: -0.02em; }
-.spec dd { margin: 0; color: var(--muted); font-size: 0.98rem; line-height: 1.65; }
-.tech { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px clamp(22px, 3vw, 40px); }
-.tech li { min-width: 0; display: flex; flex-direction: column; padding-top: 18px; border-top: 2px solid var(--ink); }
-.tech h3 { font-size: 1.25rem; }
-.tech p { margin-top: 10px; color: var(--muted); font-size: 0.98rem; }
-.tech__m { margin-top: auto; padding-top: 14px; font: 500 0.8125rem/1.4 var(--font-mono); word-spacing: -0.2em; color: var(--marker); font-variant-numeric: tabular-nums; }
-.facts-cap { margin: clamp(44px, 6vw, 72px) 0 12px; }
-.facts--wide { max-width: none; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 0; }
-@media (max-width: 900px) {
-  .tech { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .facts--wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* ---------- 하드웨어 ---------- */
+.hw { display: grid; align-items: center; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); gap: clamp(32px, 6vw, 84px); }
+.hw__fig { min-width: 0; max-width: 500px; }
+.hw__photo { aspect-ratio: 1090 / 1340; box-shadow: var(--hard); }
+.pin {
+  position: absolute; transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  font: 700 0.75rem/1 var(--font-body); padding: 7px 11px 7px 8px; border-radius: 999px;
+  background: var(--yellow); color: var(--ink); border: 2px solid var(--ink);
 }
-@media (max-width: 560px) {
-  .tech { grid-template-columns: minmax(0, 1fr); gap: 30px; }
-  .spec > div { grid-template-columns: minmax(0, 1fr); }
-}
+.pin::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+.hw__text { min-width: 0; display: grid; gap: 18px; justify-items: start; }
+.hw__text > p:not(.tag) { color: var(--muted); font-size: 1.1rem; }
+.spec { margin-top: 10px; width: 100%; }
+.spec > div { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 2px 20px; padding-block: 14px; border-top: 2px solid var(--ink); }
+.spec dt { font: 400 1.25rem/1.4 var(--font-display); }
+.spec dd { color: var(--muted); font-size: 0.98rem; line-height: 1.65; }
 
-/* ---------- 맨 아래 ---------- */
-.foot { border-top: 1px solid var(--line); padding-block: 34px 44px; color: var(--muted); font-size: 0.9rem; }
+/* ---------- 소프트웨어 ---------- */
+.tech { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 28px); }
+.tech li { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 22px 22px 24px; }
+.tech__m { font: 400 clamp(1.5rem, 2.5vw, 2.05rem)/1.15 var(--font-display); color: var(--blue); font-variant-numeric: tabular-nums; }
+.tech__m small { font: 600 0.8125rem/1 var(--font-mono); color: var(--muted); display: block; margin-bottom: 8px; letter-spacing: 0.04em; word-spacing: -0.2em; }
+.tech h3 { font-size: 1.3rem; margin-top: 6px; }
+.tech li > p:not(.tech__m) { color: var(--muted); font-size: 0.97rem; }
+
+/* ---------- 팀 ---------- */
+.team { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+.member { min-width: 0; display: flex; align-items: center; gap: 14px; padding: 18px; background: var(--ink-2); border: 2px solid var(--ink-3); border-radius: 20px; }
+.member__a { flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font: 400 1.4rem/1 var(--font-display); color: var(--ink); border: 2.5px solid var(--on-dark); }
+.member__n { font: 400 1.45rem/1.2 var(--font-display); color: var(--on-dark); overflow-wrap: anywhere; }
+.team-name { color: var(--yellow); }
+
+.foot { background: var(--ink); color: var(--on-dark-muted); border-top: 1px solid var(--ink-3); padding-block: 30px 40px; font-size: 0.9rem; }
 .foot__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 32px; }
-.foot strong { color: var(--ink); font: 800 1rem/1.4 var(--font-display); letter-spacing: -0.03em; display: block; }
-.foot__credits { font: 400 0.8125rem/1.7 var(--font-mono); max-width: 34em; }
+.foot__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--on-dark); font: 400 1.1rem/1.4 var(--font-display); }
+.foot__credits { font: 400 0.8125rem/1.7 var(--font-mono); }
 
-/* ---------- 좁은 화면 ---------- */
-@media (max-width: 900px) {
-  .hero__in, .play, .desk { grid-template-columns: minmax(0, 1fr); }
-  .hero__media { max-width: 520px; }
-  .steps { grid-template-columns: minmax(0, 1fr); gap: 44px; }
-  .step { max-width: 520px; }
-  .solve { font-size: 1rem; }
-  .pair { grid-template-columns: minmax(0, 1fr); max-width: 560px; }
-  .pair__arrow { transform: rotate(90deg); margin: 0 auto; width: 36px; }
-  .desk__fig { max-width: 380px; }
-}
+/* ---------- 움직임 ---------- */
+.js .rv { transition: transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.15s ease; }
+.js .rv:not(.in) { transform: translateY(38px); }
+.sticker.rv.in:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--ink); transition-duration: 0.15s; transition-delay: 0s !important; }
+@keyframes scribble { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes doodle { 0% { stroke-dashoffset: 1; } 30%, 72% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+@keyframes numdraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes flow-x { to { background-position: 12px 0; } }
+@keyframes flow-y { to { background-position: 0 12px; } }
 @media (prefers-reduced-motion: no-preference) {
-  .underlined path { animation: scribble 0.9s 0.35s cubic-bezier(0.3, 0, 0.2, 1) both; }
-  @keyframes scribble { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  .hero h1 em path { animation: scribble 0.9s 0.5s cubic-bezier(0.3, 0, 0.2, 1) both; }
+  #doodles path { animation: doodle 9s ease-in-out infinite; }
+  .rv.in .num path { animation: numdraw 1s 0.15s ease both; }
+  .pipe > li + li::before { animation: flow-x 0.7s linear infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn, #wb-view { transition: none; }
+  .js .rv:not(.in) { transform: none; }
+  #stage, .btn { transition: none; }
+}
+
+/* ---------- 좁은 화면 ---------- */
+@media (max-width: 1020px) {
+  .pipe { grid-template-columns: minmax(0, 1fr); max-width: 470px; gap: 36px; }
+  .pipe > li + li::before { left: calc(50% - 2px); top: -31px; width: 4px; height: 26px; background: repeating-linear-gradient(180deg, var(--ink) 0 6px, transparent 6px 12px); animation-name: flow-y; }
+  .pipe > li.pipe__split { flex-direction: row; }
+  .node code { padding-top: 4px; }
+}
+@media (max-width: 940px) {
+  .hero__in, .hw { grid-template-columns: minmax(0, 1fr); }
+  .stage { max-width: 600px; }
+  .steps { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+  .solve { font-size: 1rem; }
+  .duo { grid-template-columns: minmax(0, 1fr); max-width: 640px; }
+  .stats dl, .tech, .team { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats dl > div:first-child { grid-column: 1 / -1; }
+  .hw__fig { max-width: 420px; }
+}
+@media (max-width: 560px) {
+  .tech, .team { grid-template-columns: minmax(0, 1fr); }
+  .spec > div { grid-template-columns: minmax(0, 1fr); }
+  .seg { margin-left: 0; }
+  .field .btn { padding-inline: 16px; }
 }
 </style>
 </head>
 <body>
 <div lang="ko">
-<header class="top">
-  <div class="wrap top__in">
-    <a class="brand" href="#top" data-go="top"><span class="brand__cap" aria-hidden="true"></span>라쿤봇 AI 선생님</a>
-    <nav class="nav" aria-label="이 페이지 안에서 이동">
-      <a href="#how" data-go="how">세 단계</a>
-      <a href="#draw" data-go="draw">따라 그리기</a>
-      <a href="#write" data-go="write">써 보기</a>
-      <a href="#flow" data-go="flow">전체 흐름</a>
-      <a href="#hardware" data-go="hardware">하드웨어</a>
-      <a href="#software" data-go="software">소프트웨어</a>
-    </nav>
+<header class="hero" id="top">
+  <svg id="doodles" viewBox="0 0 100 62" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="top">
+      <a class="brand" href="#top" data-go="top"><span class="brand__cap" aria-hidden="true"></span>라쿤봇 AI 선생님</a>
+      <nav class="nav" aria-label="이 페이지 안에서 이동">
+        <a href="#how" data-go="how">세 단계</a>
+        <a href="#draw" data-go="draw">따라 그리기</a>
+        <a href="#flow" data-go="flow">전체 흐름</a>
+        <a href="#hardware" data-go="hardware">하드웨어</a>
+        <a href="#software" data-go="software">소프트웨어</a>
+        <a href="#team" data-go="team">팀</a>
+      </nav>
+    </div>
+    <div class="hero__in">
+      <div class="hero__text">
+        <p class="tag">TEAM 어벤져스</p>
+        <h1>보고, 풀고,<br><em>씁니다.<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="100" d="M4 11 C 34 5, 62 16, 98 10 S 158 6, 196 12 S 262 8, 296 11"/></svg></em></h1>
+        <p class="lead">수학 문제를 책상에 올려놓으면 <b>카메라가 읽고, AI가 풀고, 로봇팔이 보드마카로 답을 씁니다.</b> 그림을 놓으면 따라 그립니다.</p>
+        <div class="cta">
+          <a class="btn" href="#play" data-focus="say">직접 써 보기</a>
+          <a class="btn btn--white" href="#how" data-go="how">진짜 로봇 보기</a>
+        </div>
+      </div>
+
+      <div class="stage" id="play">
+        <div class="stage__bar">
+          <span class="stage__live">연습용 로봇 · 실제 글꼴 그대로</span>
+          <span id="readout">글자 높이 3.0 cm · 9획 · 선 길이 28 cm</span>
+        </div>
+        <div class="stage__desk">
+          <svg id="stage" viewBox="-0.9 -6.3 19.8 18.5" role="img" aria-labelledby="stage-title">
+            <title id="stage-title">로봇 글씨: x=1,2,3</title>
+            <rect class="st-frame" x="-0.38" y="-0.38" width="18.76" height="12.01" rx="1.05"/>
+            <rect class="st-board" x="0.06" y="0.06" width="17.88" height="11.13" rx="0.7"/>
+            <g id="wb-hops"></g>
+            <g id="wb-ink"></g>
+            <g id="wb-spark"></g>
+            <g id="arm">
+              <line class="arm-shadow" id="a-shadow" x1="9.3" y1="-3.5" x2="14.9" y2="1.9"/>
+              <rect class="arm-plate" x="7.05" y="-5.85" width="3.9" height="3.9" rx="0.6"/>
+              <line class="arm-under" id="a-u1" x1="9" y1="-3.9" x2="12.2" y2="-0.8"/>
+              <line class="arm-over" id="a-o1" x1="9" y1="-3.9" x2="12.2" y2="-0.8"/>
+              <line class="arm-grip" id="a-grip" x1="12.2" y1="-0.8" x2="14.3" y2="1.2"/>
+              <circle class="arm-motor" cx="9" cy="-3.9" r="1.3"/>
+              <circle class="arm-hub" cx="9" cy="-3.9" r="0.5"/>
+              <circle class="arm-motor" id="a-elbow" cx="10.6" cy="-2.4" r="0.84"/>
+              <circle class="arm-motor" id="a-wrist" cx="12.2" cy="-0.8" r="0.7"/>
+              <circle id="a-cap" cx="14.6" cy="1.5" r="0.5"/>
+            </g>
+          </svg>
+        </div>
+        <form class="console" id="playform" autocomplete="off">
+          <label for="say">숫자, x, y, 기호를 넣으면 로봇이 씁니다</label>
+          <div class="field">
+            <input id="say" name="say" type="text" value="x=1,2,3" maxlength="14" spellcheck="false" autocapitalize="off" aria-describedby="hint">
+            <button class="btn" type="submit" id="replay">쓰기</button>
+          </div>
+          <div class="row">
+            <button class="chip" type="button" data-text="2+3=5">2+3=5</button>
+            <button class="chip" type="button" data-text="y=2x+1">y=2x+1</button>
+            <button class="chip" type="button" data-text="3.14">3.14</button>
+            <button class="chip" type="button" data-text="7/2=?">7/2=?</button>
+            <div class="seg" role="group" aria-label="보는 자리">
+              <button class="seg__b" type="button" id="view-me" aria-pressed="true">내 자리</button>
+              <button class="seg__b" type="button" id="view-robot" aria-pressed="false">로봇 자리</button>
+            </div>
+          </div>
+          <p class="hint" id="hint" role="status"></p>
+        </form>
+      </div>
+    </div>
   </div>
 </header>
 
-<main id="top">
-  <section class="hero">
-    <div class="wrap hero__in">
-      <div class="hero__text">
-        <p class="kicker">책상 위 로봇팔 · 프로토타입</p>
-        <h1>보고, 풀고,<br><span class="underlined">씁니다.<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="100" d="M4 11 C 34 5, 62 16, 98 10 S 158 6, 196 12 S 262 8, 296 11"/></svg></span></h1>
-        <p class="lead">종이에 적은 수학 문제를 책상에 올려놓으세요. 카메라가 읽고, AI가 풀고, 작은 로봇팔이 보드마카로 답을 써 드립니다.</p>
-        <div class="cta">
-          <a class="btn btn--primary" href="#how" data-go="how">세 단계로 보기</a>
-          <a class="btn btn--ghost" href="#write" data-go="write">로봇 글씨 써 보기</a>
-        </div>
-      </div>
-      <figure class="hero__media" style="margin:0">
-        <div class="media media--square">
-          <video id="v-write" data-loop src="media/write.mp4" poster="media/write-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="로봇팔이 화이트보드에 x=1,2,3 을 쓰는 영상"></video>
-          <button class="vbtn" type="button" data-for="v-write" data-state="playing" aria-label="영상 멈춤"></button>
-        </div>
-        <figcaption class="cap"><span>실제 촬영</span><span>10배속</span><span>맞은편 자리에서 본 모습</span></figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section class="band" id="how">
+<main>
+  <section class="sec bg-mist on-light" id="how">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="kicker">문제 하나가 풀리기까지</p>
-        <h2>문제지를 놓고 Enter 한 번</h2>
-        <p class="sec-lead">나머지는 로봇이 합니다. 아래는 삼차방정식 한 문제를 실제로 풀었을 때의 기록입니다.</p>
+      <div class="head rv">
+        <p class="tag">진짜 로봇은 이렇게</p>
+        <h2>문제지를 놓으면 끝</h2>
+        <p>나머지는 로봇이 합니다. 삼차방정식 한 문제를 실제로 풀었을 때의 모습입니다.</p>
       </div>
       <ol class="steps">
-        <li class="step">
-          <div class="step__head"><span class="step__n">1</span><h3>본다</h3></div>
+        <li class="step sticker rv">
+          <div class="step__top"><svg class="num" data-g="1" viewBox="-0.1 -0.1 0.8 1.2" aria-hidden="true"></svg><h3>본다</h3></div>
           <div class="step__media"><img src="media/problem.jpg" width="820" height="461" alt="손으로 쓴 문제지 x³−6x²+11x−6=0, x=? 를 카메라 앞에 들어 보이는 손" loading="lazy"></div>
           <p>책상 위 카메라가 사진 한 장을 찍습니다. 손으로 쓴 문제도 읽습니다.</p>
         </li>
-        <li class="step">
-          <div class="step__head"><span class="step__n">2</span><h3>푼다</h3></div>
+        <li class="step sticker rv">
+          <div class="step__top"><svg class="num" data-g="2" viewBox="-0.1 -0.1 0.8 1.2" aria-hidden="true"></svg><h3>푼다</h3></div>
           <div class="step__media sheet">
             <p class="sheet__label">AI가 돌려준 풀이</p>
             <ol class="solve">
               <li>x<sup>3</sup> − 6x<sup>2</sup> + 11x − 6 = 0</li>
               <li>(x − 1)(x<sup>2</sup> − 5x + 6) = 0</li>
               <li>(x − 1)(x − 2)(x − 3) = 0</li>
-              <li class="solve__ans">x = 1, 2, 3</li>
+              <li class="solve__ans"><span>x = 1, 2, 3</span></li>
             </ol>
           </div>
           <p>AI가 식을 읽고 풀이와 답을 만듭니다. 10초 남짓 걸립니다.</p>
         </li>
-        <li class="step">
-          <div class="step__head"><span class="step__n">3</span><h3>쓴다</h3></div>
-          <div class="step__media"><img src="media/answer.jpg" width="800" height="450" alt="화이트보드에 파란 보드마카로 적힌 x=1,2,3 과 그 위의 로봇 펜" loading="lazy"></div>
+        <li class="step sticker rv">
+          <div class="step__top"><svg class="num" data-g="3" viewBox="-0.1 -0.1 0.8 1.2" aria-hidden="true"></svg><h3>쓴다</h3></div>
+          <div class="step__media">
+            <video id="v-write" data-loop src="media/write.mp4" poster="media/write-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="로봇팔이 화이트보드에 x=1,2,3 을 쓰는 영상"></video>
+            <span class="badge badge--rec">실제 촬영 · 10배속</span>
+            <button class="vbtn" type="button" data-for="v-write" data-state="playing" aria-label="영상 멈춤"></button>
+          </div>
           <p>로봇팔이 한 획씩 답을 씁니다. 3 cm 글씨 일곱 자에 약 1분 45초.</p>
         </li>
       </ol>
     </div>
   </section>
 
-  <section class="sec" id="draw">
+  <section class="sec bg-ink" id="draw">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="kicker">그림도 됩니다</p>
+      <div class="head rv">
+        <p class="tag tag--ghost">미술 선생님</p>
         <h2>그림을 놓으면 따라 그립니다</h2>
-        <p class="sec-lead">수학 문제인지 그림인지는 AI가 먼저 구분합니다. 그림이면 선으로 바꾼 뒤, 로봇이 닿는 범위 안에서 가장 크게 옮겨 그립니다.</p>
+        <p>수학 문제인지 그림인지는 AI가 먼저 구분합니다. 그림이면 선으로 바꾼 뒤, 로봇이 닿는 범위 안에서 가장 크게 옮겨 그립니다.</p>
       </div>
       <div class="duo">
-        <figure>
-          <div class="media media--wide">
+        <figure class="rv">
+          <div class="frame">
             <video id="v-draw" data-loop src="media/house.mp4" poster="media/house-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="로봇팔이 종이에 그려진 집을 화이트보드에 따라 그리는 영상"></video>
+            <span class="badge badge--rec">실제 촬영 · 6배속</span>
             <button class="vbtn" type="button" data-for="v-draw" data-state="playing" aria-label="영상 멈춤"></button>
           </div>
-          <figcaption class="cap"><span>그리는 과정</span><span>실제 촬영</span><span>6배속</span></figcaption>
+          <figcaption class="cap">그리는 과정</figcaption>
         </figure>
-        <figure>
-          <div class="media media--wide"><img src="media/house-result.jpg" width="1280" height="720" alt="왼쪽 종이에 사람이 그린 집, 오른쪽 화이트보드에 로봇이 따라 그린 집" loading="lazy"></div>
-          <figcaption class="cap"><span>왼쪽이 보여준 그림</span><span>오른쪽이 로봇이 그린 그림</span></figcaption>
+        <figure class="rv">
+          <div class="frame"><img src="media/house-result.jpg" width="1280" height="720" alt="왼쪽 종이에 사람이 그린 집, 오른쪽 화이트보드에 로봇이 따라 그린 집" loading="lazy"></div>
+          <figcaption class="cap">왼쪽이 보여준 그림 · 오른쪽이 로봇이 그린 그림</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <section class="sec" id="write">
-    <div class="wrap play">
-      <div class="play__text">
-        <p class="kicker">직접 해 보기</p>
-        <h2>로봇 글씨체로 써 보세요</h2>
-        <p>로봇은 선 몇 개로 된 글꼴로 씁니다. 여기 나오는 획은 실제 로봇에 들어 있는 것과 같습니다. 맞은편 사람이 읽기 좋도록, 로봇은 자기 쪽에서 볼 때 글씨를 거꾸로 씁니다.</p>
-        <form class="form" id="playform" autocomplete="off">
-          <label for="say">쓸 내용 (숫자, x, y, 기호)</label>
-          <div class="field">
-            <input id="say" name="say" type="text" value="x=1,2,3" maxlength="14" spellcheck="false" autocapitalize="off" aria-describedby="hint">
-            <button class="btn btn--primary" type="submit" id="replay">다시 쓰기</button>
-          </div>
-          <div class="chips" aria-label="예시">
-            <button class="chip" type="button" data-text="2+3=5">2+3=5</button>
-            <button class="chip" type="button" data-text="y=2x+1">y=2x+1</button>
-            <button class="chip" type="button" data-text="(x-1)(x-2)=0">(x-1)(x-2)=0</button>
-            <button class="chip" type="button" data-text="3.14">3.14</button>
-            <button class="chip" type="button" data-text="7/2=?">7/2=?</button>
-          </div>
-          <p class="hint" id="hint" role="status"></p>
-          <div class="seg" role="group" aria-label="보는 자리">
-            <button class="seg__b" type="button" id="view-me" aria-pressed="true">내 자리에서</button>
-            <button class="seg__b" type="button" id="view-robot" aria-pressed="false">로봇 자리에서</button>
-          </div>
-        </form>
-      </div>
-      <figure class="play__board">
-        <div class="wbframe">
-          <svg id="wb" viewBox="0 0 18 11.25" role="img" aria-labelledby="wb-title" preserveAspectRatio="xMidYMid meet">
-            <title id="wb-title">로봇 글씨: x=1,2,3</title>
-            <g id="wb-view">
-              <g id="wb-hops"></g>
-              <g id="wb-ink"></g>
-              <circle id="wb-pen" r="0.22" cx="0" cy="0"></circle>
-            </g>
-          </svg>
-          <span class="wbside wbside--top" id="side-top">로봇 쪽</span>
-          <span class="wbside wbside--bottom" id="side-bottom">읽는 사람 쪽</span>
-        </div>
-        <figcaption class="cap readout" id="readout"><span>글자 높이 3.0 cm</span><span>9획</span><span>선 길이 28 cm</span></figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section class="sec" id="flow">
+  <section class="stats bg-yellow" aria-labelledby="stats-cap">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="kicker">전체 흐름</p>
+      <p class="stats__cap" id="stats-cap">마지막 집 그림에서 잰 값</p>
+      <dl>
+        <div><dt>집 그림 크기</dt><dd>12.0×10.9<small>cm</small></dd></div>
+        <div><dt>그리는 시간</dt><dd><span data-to="105" data-dec="0">105</span><small>초</small></dd></div>
+        <div><dt>평균 위치 오차</dt><dd><span data-to="2.1" data-dec="1">2.1</span><small>mm</small></dd></div>
+        <div><dt>계획한 선 중 그려진 비율</dt><dd><span data-to="98.3" data-dec="1">98.3</span><small>%</small></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec on-light" id="flow">
+    <div class="wrap">
+      <div class="head rv">
+        <p class="tag">전체 흐름</p>
         <h2>사진 한 장이 펜의 움직임이 되기까지</h2>
-        <p class="sec-lead">사진 한 장과 AI 호출 한 번으로 시작해 여섯 단계를 거칩니다. 실행하는 동안 사람은 손대지 않습니다.</p>
+        <p>사진 한 장과 AI 호출 한 번으로 시작해 여섯 단계를 거칩니다. 실행하는 동안 사람은 손대지 않습니다.</p>
       </div>
-      <ol class="pipe">
-        <li><div class="node"><span class="node__k">01</span><h3>촬영</h3><p>깊이 카메라가 책상을 사진 한 장으로 찍습니다.</p><code>robot_cam.py</code></div></li>
-        <li><div class="node"><span class="node__k">02</span><h3>판단</h3><p>Gemini가 수학인지 그림인지 정하고, 풀이나 선화를 돌려줍니다.</p><code>teacher.py</code></div></li>
+      <ol class="pipe rv">
+        <li><div class="node"><span class="node__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="3"/><circle cx="12" cy="13" r="3.4"/><path d="M8 7l1.5-3h5L16 7"/></svg></span><span class="node__k">01</span><h3>촬영</h3><p>깊이 카메라가 책상을 사진 한 장으로 찍습니다.</p><code>robot_cam.py</code></div></li>
+        <li><div class="node"><span class="node__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L14.2 9.3 L20.5 12 L14.2 14.2 L12 21 L9.8 14.2 L3.5 12 L9.8 9.3 Z"/></svg></span><span class="node__k">02</span><h3>판단</h3><p>Gemini가 수학인지 그림인지 정하고, 풀이나 선화를 돌려줍니다.</p><code>teacher.py</code></div></li>
         <li class="pipe__split">
           <div class="node"><span class="node__k">03 수학</span><h3>답을 획으로</h3><p>답을 각진 글꼴의 선으로 바꿉니다.</p><code>math_teacher.py</code></div>
-          <div class="node"><span class="node__k">03 그림</span><h3>선을 다듬기</h3><p>기울기를 펴고 크기와 자리를 정합니다.</p><code>art_teacher.py</code></div>
+          <div class="node"><span class="node__k">03 그림</span><h3>선 다듬기</h3><p>기울기를 펴고 크기와 자리를 정합니다.</p><code>art_teacher.py</code></div>
         </li>
-        <li><div class="node"><span class="node__k">04</span><h3>획 실행</h3><p>선을 펜 내리기, 긋기, 떼기 동작으로 바꿉니다.</p><code>pen.py</code></div></li>
-        <li><div class="node"><span class="node__k">05</span><h3>안전 검사</h3><p>이동마다 범위와 도달 여부를 먼저 확인합니다.</p><code>raccoon_safe.py</code></div></li>
-        <li><div class="node node--end"><span class="node__k">06</span><h3>쓰기</h3><p>로봇팔이 보드마카로 화이트보드에 씁니다.</p><code>라쿤봇</code></div></li>
+        <li><div class="node"><span class="node__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 L5 15 L16 4 L20 8 L9 19 Z M14 6 L18 10"/></svg></span><span class="node__k">04</span><h3>획 실행</h3><p>선을 펜 내리기, 긋기, 떼기 동작으로 바꿉니다.</p><code>pen.py</code></div></li>
+        <li><div class="node"><span class="node__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L20 6 V12 C20 17 16.5 20 12 21 C7.5 20 4 17 4 12 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></span><span class="node__k">05</span><h3>안전 검사</h3><p>이동마다 범위와 도달 여부를 먼저 확인합니다.</p><code>raccoon_safe.py</code></div></li>
+        <li><div class="node node--end"><span class="node__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><path d="M7.5 16 L12 8 L18 11"/><circle cx="12" cy="8" r="1.8"/><path d="M18 11 L20.5 10 M18 11 L19.5 13.5"/></svg></span><span class="node__k">06</span><h3>쓰기</h3><p>로봇팔이 보드마카로 화이트보드에 씁니다.</p><code>라쿤봇</code></div></li>
       </ol>
     </div>
   </section>
 
-  <section class="sec" id="hardware">
-    <div class="wrap desk">
-      <figure class="desk__fig">
-        <div class="media desk__photo">
+  <section class="sec bg-mist on-light" id="hardware">
+    <div class="wrap hw">
+      <figure class="hw__fig rv">
+        <div class="frame hw__photo">
           <img src="media/setup.jpg" width="1090" height="1340" alt="실험 환경. 왼쪽 위 거치대에 달린 깊이 카메라가 흰 책상을 내려다보고, 책상 위에 로봇팔, 화이트보드, 수학 문제지가 놓여 있다" loading="lazy">
           <span class="pin" style="left:13.5%;top:8.5%">깊이 카메라</span>
-          <span class="pin" style="left:73%;top:43%">문제지</span>
-          <span class="pin" style="left:72%;top:63%">로봇팔</span>
-          <span class="pin" style="left:50%;top:76%">화이트보드</span>
+          <span class="pin" style="left:70%;top:43%">문제지</span>
+          <span class="pin" style="left:70%;top:63%">로봇팔</span>
+          <span class="pin" style="left:46%;top:76%">화이트보드</span>
         </div>
-        <figcaption class="cap"><span>실험 환경</span><span>실제 촬영</span></figcaption>
       </figure>
-      <div class="desk__text">
-        <p class="kicker">하드웨어</p>
+      <div class="hw__text rv">
+        <p class="tag">하드웨어</p>
         <h2>카메라까지가 하나의 실험 환경입니다</h2>
         <p>로봇팔, 깊이 카메라, 화이트보드, 보드마카. 전부 책상 하나에 올라갑니다.</p>
         <dl class="spec">
@@ -570,35 +514,43 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     </div>
   </section>
 
-  <section class="sec" id="software">
+  <section class="sec bg-blue" id="software">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="kicker">소프트웨어</p>
+      <div class="head rv">
+        <p class="tag">소프트웨어</p>
         <h2>로봇의 한계를 재고, 계산으로 메웠습니다</h2>
-        <p class="sec-lead">이 로봇은 움직일 때마다 2~3 mm씩 어긋나고, 관절이 따로 움직여 펜이 뜨기도 합니다. 문제를 하나씩 재서 소프트웨어로 보완했습니다.</p>
+        <p>이 로봇은 움직일 때마다 2~3 mm씩 어긋나고, 관절이 따로 움직여 펜이 뜨기도 합니다. 문제를 하나씩 재서 소프트웨어로 보완했습니다.</p>
       </div>
       <ul class="tech">
-        <li><h3>AI 호출은 한 번</h3><p>사진과 지시를 Gemini에 한 번 보내면, 할 일의 종류와 풀이 또는 선화가 함께 돌아옵니다.</p><span class="tech__m">응답 10~14초</span></li>
-        <li><h3>각진 글꼴</h3><p>곡선을 잘게 나눠 그리면 오차가 쌓입니다. 긴 직선만 쓰는 글꼴을 만들어 쓰는 시간을 절반으로 줄였습니다.</p><span class="tech__m">209.7초 → 103.5초</span></li>
-        <li><h3>기울기 바로잡기</h3><p>카메라가 종이를 비스듬히 보면 그림이 한쪽으로 기웁니다. 세로선과 가로선이 똑바로 서도록 그림 전체를 폅니다.</p><span class="tech__m">기울기 12~15° → 0°</span></li>
-        <li><h3>크기와 자리 찾기</h3><p>모든 점이 닿는지 역기구학으로 미리 계산해, 가장 크게 그릴 수 있는 자리를 고릅니다.</p><span class="tech__m">한 변 7 cm → 13 cm</span></li>
-        <li><h3>펜이 뜨지 않게</h3><p>로봇 쪽으로 다가오는 선에서는 펜이 떠서 점선이 됐습니다. 목표를 0.5 mm씩 잘게 보내 해결했습니다.</p><span class="tech__m">뜨는 높이 13 mm → 0.47 mm 이하</span></li>
-        <li><h3>안전 장치</h3><p>모든 이동은 범위와 도달 여부 검사를 통과해야 하고, 속도에는 상한이 있습니다. 기본 실행은 로봇을 움직이지 않는 미리보기입니다.</p><span class="tech__m">속도 상한 30 / 100</span></li>
+        <li class="sticker rv"><p class="tech__m"><small>AI 응답</small>10~14초</p><h3>AI 호출은 한 번</h3><p>사진과 지시를 Gemini에 한 번 보내면, 할 일의 종류와 풀이 또는 선화가 함께 돌아옵니다.</p></li>
+        <li class="sticker rv"><p class="tech__m"><small>쓰는 시간</small>209.7 → 103.5초</p><h3>각진 글꼴</h3><p>곡선을 잘게 나눠 그리면 오차가 쌓입니다. 긴 직선만 쓰는 글꼴을 만들어 시간을 절반으로 줄였습니다.</p></li>
+        <li class="sticker rv"><p class="tech__m"><small>그림 기울기</small>12~15° → 0°</p><h3>기울기 바로잡기</h3><p>카메라가 종이를 비스듬히 보면 그림이 한쪽으로 기웁니다. 세로선과 가로선이 똑바로 서도록 폅니다.</p></li>
+        <li class="sticker rv"><p class="tech__m"><small>그림 한 변</small>7 → 13 cm</p><h3>크기와 자리 찾기</h3><p>모든 점이 닿는지 역기구학으로 미리 계산해, 가장 크게 그릴 수 있는 자리를 고릅니다.</p></li>
+        <li class="sticker rv"><p class="tech__m"><small>펜이 뜨는 높이</small>13 → 0.47 mm</p><h3>펜이 뜨지 않게</h3><p>로봇 쪽으로 다가오는 선에서는 펜이 떠서 점선이 됐습니다. 목표를 0.5 mm씩 잘게 보내 해결했습니다.</p></li>
+        <li class="sticker rv"><p class="tech__m"><small>속도 상한</small>30 / 100</p><h3>안전 장치</h3><p>모든 이동은 범위와 도달 여부 검사를 통과해야 합니다. 기본 실행은 로봇을 움직이지 않는 미리보기입니다.</p></li>
       </ul>
-      <p class="kicker facts-cap">마지막 집 그림에서 잰 값</p>
-      <dl class="facts facts--wide">
-        <div><dt>집 그림 크기</dt><dd>12.0 × 10.9 cm</dd></div>
-        <div><dt>그리는 시간</dt><dd>105초</dd></div>
-        <div><dt>평균 위치 오차</dt><dd>2.1 mm</dd></div>
-        <div><dt>계획한 선 중 그려진 비율</dt><dd>98.3%</dd></div>
-      </dl>
+    </div>
+  </section>
+
+  <section class="sec bg-ink" id="team">
+    <div class="wrap">
+      <div class="head rv">
+        <p class="tag tag--ghost">만든 사람들</p>
+        <h2>팀 <span class="team-name">어벤져스</span></h2>
+      </div>
+      <ul class="team">
+        <li class="member rv"><span class="member__a" style="background:#ffd60a" aria-hidden="true">신</span><span class="member__n">신일한</span></li>
+        <li class="member rv"><span class="member__a" style="background:#7aa2ff" aria-hidden="true">이</span><span class="member__n">이원종</span></li>
+        <li class="member rv"><span class="member__a" style="background:#ff8a70" aria-hidden="true">S</span><span class="member__n">Selim</span></li>
+        <li class="member rv"><span class="member__a" style="background:#5fdca0" aria-hidden="true">최</span><span class="member__n">최현지</span></li>
+      </ul>
     </div>
   </section>
 </main>
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <p class="foot__brand"><span class="brand__cap" aria-hidden="true"></span>라쿤봇 AI 선생님<!--TEAM--></p>
+    <p class="foot__brand"><span class="brand__cap" aria-hidden="true"></span>라쿤봇 AI 선생님 · 팀 어벤져스</p>
     <p class="foot__credits">Raccoon Robot · Intel RealSense D455 · Google Gemini · OpenCV</p>
   </div>
 </footer>
@@ -607,8 +559,12 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 <script>
 (function () {
   "use strict";
-  document.documentElement.lang = "ko";
+  var root = document.documentElement;
+  root.lang = "ko";
+  root.classList.add("js");
   var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var hasIO = "IntersectionObserver" in window;
+  var NS = "http://www.w3.org/2000/svg";
 
   /* ---- 페이지 안 이동 ---- */
   document.querySelectorAll("[data-go]").forEach(function (a) {
@@ -619,6 +575,44 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
       el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     });
   });
+  document.querySelectorAll("[data-focus]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var el = document.getElementById(a.getAttribute("data-focus"));
+      if (!el) return;
+      e.preventDefault();
+      document.getElementById("play").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      try { el.focus({ preventScroll: true }); el.select(); } catch (err) {}
+    });
+  });
+
+  /* ---- 화면에 들어올 때 올라오기 (글자는 처음부터 보이고 자리만 움직인다) ---- */
+  var rvs = document.querySelectorAll(".rv");
+  if (hasIO && !reduce) {
+    var rvo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("in"); rvo.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    rvs.forEach(function (el, i) { el.style.transitionDelay = (i % 3) * 70 + "ms"; rvo.observe(el); });
+  } else {
+    rvs.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---- 숫자 올라가기 ---- */
+  if (hasIO && !reduce) {
+    var cno = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        cno.unobserve(en.target);
+        var el = en.target, to = parseFloat(el.getAttribute("data-to")), dec = parseInt(el.getAttribute("data-dec"), 10) || 0;
+        var t0 = performance.now();
+        (function step(now) {
+          var q = Math.min(Math.max((now - t0) / 1200, 0), 1), v = to * (1 - Math.pow(1 - q, 3));
+          el.textContent = v.toFixed(dec);
+          if (q < 1) requestAnimationFrame(step); else el.textContent = to.toFixed(dec);
+        })(t0);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll("[data-to]").forEach(function (el) { cno.observe(el); });
+  }
 
   /* ---- 영상: 보일 때만 재생, 버튼으로 멈춤 ---- */
   document.querySelectorAll("video[data-loop]").forEach(function (v) {
@@ -635,7 +629,7 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     });
     v.addEventListener("play", sync);
     v.addEventListener("pause", sync);
-    v.addEventListener("error", function once() {          // 파일을 직접 못 읽는 환경이면 blob 으로 다시 시도
+    v.addEventListener("error", function once() {
       v.removeEventListener("error", once);
       fetch(src).then(function (r) { return r.blob(); }).then(function (b) {
         v.src = URL.createObjectURL(b);
@@ -643,11 +637,9 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
       }).catch(function () {});
     });
     if (reduce) { v.removeAttribute("autoplay"); v.pause(); }
-    if ("IntersectionObserver" in window) {
+    if (hasIO) {
       new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) { if (!userPaused) play(); } else { v.pause(); }
-        });
+        entries.forEach(function (en) { if (en.isIntersecting) { if (!userPaused) play(); } else { v.pause(); } });
       }, { threshold: 0.25 }).observe(v);
     }
     sync();
@@ -655,49 +647,7 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 
   /* ---- 로봇 글씨체: pen.py 의 한 획 글꼴 그대로 (글자 상자 높이 1, x 오른쪽, y 위) ---- */
   var FONT = {"0":[0.6,[[[0.3,1.0],[0.15,0.933],[0.04,0.75],[0.0,0.5],[0.04,0.25],[0.15,0.067],[0.3,0.0],[0.45,0.067],[0.56,0.25],[0.6,0.5],[0.56,0.75],[0.45,0.933],[0.3,1.0]]]],"1":[0.4,[[[0.1,0.8],[0.3,1.0],[0.3,0.0]]]],"2":[0.6,[[[0.0,0.75],[0.1,0.95],[0.3,1.0],[0.5,0.95],[0.6,0.75],[0.55,0.55],[0.0,0.0],[0.6,0.0]]]],"3":[0.6,[[[0.0,0.9],[0.2,1.0],[0.45,1.0],[0.6,0.85],[0.55,0.62],[0.3,0.52],[0.55,0.42],[0.6,0.2],[0.45,0.02],[0.2,0.0],[0.0,0.1]]]],"4":[0.6,[[[0.45,0.0],[0.45,1.0],[0.0,0.3],[0.6,0.3]]]],"5":[0.6,[[[0.55,1.0],[0.05,1.0],[0.0,0.55],[0.3,0.6],[0.5,0.55],[0.6,0.35],[0.55,0.12],[0.35,0.0],[0.1,0.0],[0.0,0.1]]]],"6":[0.6,[[[0.5,0.95],[0.3,1.0],[0.1,0.9],[0.0,0.6],[0.0,0.25],[0.15,0.02],[0.4,0.0],[0.58,0.15],[0.6,0.35],[0.45,0.52],[0.2,0.52],[0.0,0.35]]]],"7":[0.6,[[[0.0,1.0],[0.6,1.0],[0.2,0.0]]]],"8":[0.6,[[[0.3,0.52],[0.08,0.62],[0.05,0.85],[0.3,1.0],[0.55,0.85],[0.52,0.62],[0.3,0.52],[0.05,0.38],[0.0,0.15],[0.3,0.0],[0.6,0.15],[0.55,0.38],[0.3,0.52]]]],"9":[0.6,[[[0.58,0.62],[0.4,0.5],[0.15,0.5],[0.0,0.7],[0.1,0.95],[0.35,1.0],[0.55,0.9],[0.6,0.65],[0.55,0.25],[0.35,0.02],[0.1,0.05]]]],"x":[0.5,[[[0.0,0.6],[0.5,0.0]],[[0.0,0.0],[0.5,0.6]]]],"y":[0.5,[[[0.0,0.6],[0.25,0.15]],[[0.5,0.6],[0.1,-0.35]]]],"=":[0.5,[[[0.0,0.35],[0.5,0.35]],[[0.0,0.65],[0.5,0.65]]]],"+":[0.5,[[[0.25,0.2],[0.25,0.7]],[[0.0,0.45],[0.5,0.45]]]],"-":[0.5,[[[0.0,0.45],[0.5,0.45]]]],"/":[0.5,[[[0.0,0.0],[0.5,1.0]]]],".":[0.2,[[[0.08,0.0],[0.12,0.04]]]],",":[0.25,[[[0.15,0.08],[0.05,-0.2]]]],":":[0.25,[[[0.1,0.65],[0.14,0.69]],[[0.1,0.2],[0.14,0.24]]]],"?":[0.6,[[[0.0,0.8],[0.15,1.0],[0.45,1.0],[0.6,0.8],[0.3,0.5],[0.3,0.3]],[[0.3,0.05],[0.3,0.0]]]],"(":[0.3,[[[0.3,1.05],[0.1,0.75],[0.05,0.5],[0.1,0.25],[0.3,-0.05]]]],")":[0.3,[[[0.0,1.05],[0.2,0.75],[0.25,0.5],[0.2,0.25],[0.0,-0.05]]]]," ":[0.4,[]]};
-  var GAP = 0.25;            // 글자 사이 (글자 높이 대비)
-  var MAX_W = 14;            // 쓰는 폭 한계 cm
-  var MAX_H = 4.5;           // 기본 글자 높이 cm
-  var VB_W = 18, VB_H = 11.25;
-  var NS = "http://www.w3.org/2000/svg";
-
-  var input = document.getElementById("say");
-  var form = document.getElementById("playform");
-  var hint = document.getElementById("hint");
-  var readout = document.getElementById("readout");
-  var title = document.getElementById("wb-title");
-  var view = document.getElementById("wb-view");
-  var gInk = document.getElementById("wb-ink");
-  var gHop = document.getElementById("wb-hops");
-  var pen = document.getElementById("wb-pen");
-  var raf = 0, plan = null;
-
-  function clean(raw) {
-    var out = "", dropped = false;
-    for (var i = 0; i < raw.length; i++) {
-      var c = raw.charAt(i);
-      if (c === "X" || c === "Y") c = c.toLowerCase();
-      if (c === "×" || c === "*") { dropped = true; continue; }
-      if (Object.prototype.hasOwnProperty.call(FONT, c)) out += c; else dropped = true;
-    }
-    return { text: out, dropped: dropped };
-  }
-
-  function layout(text) {
-    var wEm = 0, i;
-    for (i = 0; i < text.length; i++) wEm += FONT[text.charAt(i)][0] + GAP;
-    wEm = Math.max(wEm - GAP, 0);
-    var h = wEm > 0 ? Math.min(MAX_H, MAX_W / wEm) : MAX_H;
-    var x0 = (VB_W - wEm * h) / 2, base = VB_H / 2 + h * 0.42, cx = 0, strokes = [];
-    for (i = 0; i < text.length; i++) {
-      var glyph = FONT[text.charAt(i)];
-      glyph[1].forEach(function (s) {
-        strokes.push(s.map(function (p) { return [x0 + (cx + p[0]) * h, base - p[1] * h]; }));
-      });
-      cx += glyph[0] + GAP;
-    }
-    return { h: h, strokes: strokes };
-  }
+  var GAP = 0.25, MAX_W = 14, MAX_H = 4.5, VB_W = 18, VB_H = 11.25;
 
   function el(name, attrs) {
     var n = document.createElementNS(NS, name);
@@ -708,57 +658,140 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     return points.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(3) + " " + p[1].toFixed(3); }).join(" ");
   }
   function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  function glyphPath(ch, x, y, h) {      // 글자 하나를 (x, y) 왼쪽 아래 기준 높이 h 로
+    return FONT[ch][1].map(function (s) {
+      return d(s.map(function (p) { return [x + p[0] * h, y - p[1] * h]; }));
+    }).join(" ");
+  }
+
+  /* ---- 첫 화면 배경 낙서 + 단계 숫자: 모두 로봇 글꼴로 ---- */
+  var doodles = document.getElementById("doodles");
+  [["x", 3, 22, 7, -14], ["=", 40, 58, 6, 8], ["3", 92, 16, 8, 12], ["+", 47, 9, 6, -10], ["?", 26, 60, 7, 16],
+   ["2", 2, 56, 7, 8], ["7", 95, 52, 6, -12], ["y", 68, 8, 6, 10], ["5", 15, 5, 5, -6]].forEach(function (g, i) {
+    var p = el("path", { d: glyphPath(g[0], 0, 0, g[3]), pathLength: "1", transform: "translate(" + g[1] + " " + g[2] + ") rotate(" + g[4] + ")" });
+    p.style.animationDelay = (-i * 1.3) + "s";
+    doodles.appendChild(p);
+  });
+  document.querySelectorAll(".num").forEach(function (svg) {
+    svg.appendChild(el("path", { d: glyphPath(svg.getAttribute("data-g"), 0, 1, 1), pathLength: "1" }));
+  });
+
+  /* ---- 연습용 로봇 ---- */
+  var input = document.getElementById("say");
+  var form = document.getElementById("playform");
+  var hint = document.getElementById("hint");
+  var readout = document.getElementById("readout");
+  var title = document.getElementById("stage-title");
+  var stage = document.getElementById("stage");
+  var gInk = document.getElementById("wb-ink");
+  var gHop = document.getElementById("wb-hops");
+  var gSpark = document.getElementById("wb-spark");
+  var A = {};
+  ["shadow", "u1", "o1", "grip", "elbow", "wrist", "cap"].forEach(function (k) { A[k] = document.getElementById("a-" + k); });
+  var BASE = [9, -3.9], HOME = [14.6, 1.5];              // 쉬는 자리: 글씨를 가리지 않게 보드 오른쪽 위
+  var LINK = 6, GRIP = 3.2, SHOULDER_Z = 4, WRIST_Z = 1.5;   // 실제 로봇처럼 팔은 세로면에서 접히고, 위에서 보면 한 줄로 늘었다 줄었다 한다
+  var SPARK_COLORS = ["#ffd60a", "#1a47e8", "#ff5b3a", "#18b26b"];
+  var sparks = [];
+  for (var si = 0; si < 12; si++) {
+    var sc = el("circle", { r: "0", cx: "0", cy: "0", fill: SPARK_COLORS[si % 4] });
+    gSpark.appendChild(sc);
+    sparks.push(sc);
+  }
+  var raf = 0, plan = null;
+
+  function setLine(node, a, b) {
+    node.setAttribute("x1", a[0].toFixed(3)); node.setAttribute("y1", a[1].toFixed(3));
+    node.setAttribute("x2", b[0].toFixed(3)); node.setAttribute("y2", b[1].toFixed(3));
+  }
+  function setArm(p, down) {
+    var dx = p[0] - BASE[0], dy = p[1] - BASE[1], dd = Math.hypot(dx, dy) || 1e-6, ux = dx / dd, uy = dy / dd;
+    var w = Math.max(dd - GRIP, 1.6), dz = WRIST_Z - SHOULDER_Z;
+    var D = Math.min(Math.hypot(w, dz), 2 * LINK - 0.01);
+    var er = LINK * Math.cos(Math.atan2(dz, w) + Math.acos(D / (2 * LINK)));   // 세로면 역기구학으로 구한 팔꿈치 자리
+    er = Math.min(Math.max(er, 0.42 * w), 0.6 * w);                           // 위에서 볼 때 모터가 겹치지 않게
+    var e = [BASE[0] + ux * er, BASE[1] + uy * er], wr = [BASE[0] + ux * w, BASE[1] + uy * w];
+    var tip = [p[0] - ux * 0.35, p[1] - uy * 0.35];
+    setLine(A.u1, BASE, wr); setLine(A.o1, BASE, wr); setLine(A.grip, wr, tip);
+    setLine(A.shadow, [BASE[0] + 0.3, BASE[1] + 0.42], [p[0] + 0.3, p[1] + 0.42]);
+    A.elbow.setAttribute("cx", e[0].toFixed(3)); A.elbow.setAttribute("cy", e[1].toFixed(3));
+    A.wrist.setAttribute("cx", wr[0].toFixed(3)); A.wrist.setAttribute("cy", wr[1].toFixed(3));
+    A.cap.setAttribute("cx", p[0].toFixed(3)); A.cap.setAttribute("cy", p[1].toFixed(3));
+    A.cap.setAttribute("r", down ? "0.46" : "0.56");
+    A.cap.setAttribute("class", down ? "" : "is-up");
+  }
+
+  function clean(raw) {
+    var out = "", dropped = false;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw.charAt(i);
+      if (ch === "X" || ch === "Y") ch = ch.toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(FONT, ch)) out += ch; else dropped = true;
+    }
+    return { text: out, dropped: dropped };
+  }
+  function layout(text) {
+    var wEm = 0, i;
+    for (i = 0; i < text.length; i++) wEm += FONT[text.charAt(i)][0] + GAP;
+    wEm = Math.max(wEm - GAP, 0);
+    var h = wEm > 0 ? Math.min(MAX_H, MAX_W / wEm) : MAX_H;
+    var x0 = (VB_W - wEm * h) / 2, base = VB_H / 2 + h * 0.42, cx = 0, strokes = [];
+    for (i = 0; i < text.length; i++) {
+      var glyph = FONT[text.charAt(i)];
+      glyph[1].forEach(function (s) { strokes.push(s.map(function (p) { return [x0 + (cx + p[0]) * h, base - p[1] * h]; })); });
+      cx += glyph[0] + GAP;
+    }
+    return { h: h, strokes: strokes };
+  }
 
   function build(text) {
-    var lay = layout(text), segs = [], total = 0, t = 0.25;
+    var lay = layout(text), segs = [], total = 0, prev = HOME;
     gInk.textContent = ""; gHop.textContent = "";
     lay.strokes.forEach(function (s, i) {
-      if (i > 0) {
-        var a = lay.strokes[i - 1][lay.strokes[i - 1].length - 1], b = s[0];
-        var hop = el("path", { "class": "hop", d: d([a, b]) });
-        gHop.appendChild(hop);
-        segs.push({ kind: "hop", node: hop, a: a, b: b, len: dist(a, b) });
-      }
+      var hopNode = null;
+      if (i > 0) { hopNode = el("path", { "class": "hop", d: d([prev, s[0]]) }); gHop.appendChild(hopNode); }
+      segs.push({ kind: "hop", node: hopNode, a: prev, b: s[0], len: dist(prev, s[0]) });
       var path = el("path", { "class": "ink", d: d(s) });
       gInk.appendChild(path);
       var len = path.getTotalLength();
       path.style.strokeDasharray = len + " " + (len + 1);
       total += len;
-      segs.push({ kind: "ink", node: path, len: len, a: s[0] });
+      segs.push({ kind: "ink", node: path, len: len });
+      prev = s[s.length - 1];
     });
-    var drawV = 9, hopV = 26, time = 0;                    // 화면 속도 cm/s
-    segs.forEach(function (g) { time += g.len / (g.kind === "ink" ? drawV : hopV) + (g.kind === "ink" ? 0.06 : 0); });
-    var k = time > 6.5 ? time / 6.5 : 1;                   // 긴 글은 전체 6.5초 안에
+    var inkV = 9, hopV = 24, raw = 0;                       // 화면 속도 cm/s
+    segs.forEach(function (g) { raw += g.len / (g.kind === "ink" ? inkV : hopV) + (g.kind === "ink" ? 0.06 : 0); });
+    var k = raw > 7 ? raw / 7 : 1, t = 0.25;                // 긴 글도 7초 안에
     segs.forEach(function (g) {
-      g.t0 = t;
-      t += g.len / (g.kind === "ink" ? drawV : hopV) / k;
-      g.t1 = t;
+      g.t0 = t; t += g.len / (g.kind === "ink" ? inkV : hopV) / k; g.t1 = t;
       if (g.kind === "ink") t += 0.06 / k;
     });
-    return { segs: segs, end: t, h: lay.h, n: lay.strokes.length, total: total };
+    var inkEnd = t, last = prev;
+    if (segs.length) { segs.push({ kind: "hop", node: null, a: prev, b: HOME, len: dist(prev, HOME), t0: t + 0.3, t1: t + 0.85 }); t += 0.85; }
+    return { segs: segs, end: t, inkEnd: inkEnd, last: last, h: lay.h, n: lay.strokes.length, total: total };
   }
 
   function paint(t) {
-    var where = null, down = false;
+    var where = HOME, down = false, started = false;
     plan.segs.forEach(function (g) {
       var p = g.t1 > g.t0 ? Math.min(Math.max((t - g.t0) / (g.t1 - g.t0), 0), 1) : (t >= g.t0 ? 1 : 0);
       if (g.kind === "ink") {
-        g.node.style.visibility = t >= g.t0 ? "visible" : "hidden";     // 아직 안 쓴 획은 시작점의 둥근 끝도 보이지 않게
+        g.node.style.visibility = t >= g.t0 ? "visible" : "hidden";
         g.node.style.strokeDashoffset = (g.len * (1 - p)).toFixed(3);
-        if (t >= g.t0 && t <= g.t1) { var q = g.node.getPointAtLength(g.len * p); where = [q.x, q.y]; down = true; }
+        if (t >= g.t0) { var q = g.node.getPointAtLength(g.len * p); where = [q.x, q.y]; down = t <= g.t1; started = true; }
       } else {
-        g.node.style.opacity = t >= g.t0 ? 1 : 0;
-        if (t >= g.t0 && t <= g.t1) { where = [g.a[0] + (g.b[0] - g.a[0]) * p, g.a[1] + (g.b[1] - g.a[1]) * p]; down = false; }
+        if (g.node) g.node.style.opacity = t >= g.t0 ? 1 : 0;
+        if (t >= g.t0) { var s = p * p * (3 - 2 * p); where = [g.a[0] + (g.b[0] - g.a[0]) * s, g.a[1] + (g.b[1] - g.a[1]) * s]; down = false; }
       }
     });
-    if (where && t < plan.end) {
-      pen.setAttribute("cx", where[0].toFixed(3));
-      pen.setAttribute("cy", where[1].toFixed(3));
-      pen.setAttribute("class", down ? "" : "is-up");
-      pen.style.opacity = 1;
-    } else if (t >= plan.end) {
-      pen.style.opacity = 0;
-    }
+    setArm(where, down);
+    var sq = (t - plan.inkEnd) / 0.75;                     // 다 쓰면 반짝
+    sparks.forEach(function (c, i) {
+      if (!started || sq < 0 || sq > 1) { c.setAttribute("r", "0"); return; }
+      var ang = i / sparks.length * Math.PI * 2 + 0.4, rr = 0.5 + (1 - Math.pow(1 - sq, 3)) * (1.5 + (i % 3) * 0.5);
+      c.setAttribute("cx", (plan.last[0] + Math.cos(ang) * rr).toFixed(3));
+      c.setAttribute("cy", (plan.last[1] + Math.sin(ang) * rr).toFixed(3));
+      c.setAttribute("r", (0.2 * (1 - sq)).toFixed(3));
+    });
   }
 
   function show(animate) {
@@ -768,50 +801,40 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
     hint.textContent = c.dropped ? "쓸 수 없는 글자는 뺐습니다. 숫자, x, y, = + - / . , : ? ( ) 만 씁니다." : "";
     plan = build(c.text);
     title.textContent = "로봇 글씨: " + (c.text || "(비어 있음)");
-    readout.innerHTML = c.text.trim()
-      ? "<span>글자 높이 " + plan.h.toFixed(1) + " cm</span><span>" + plan.n + "획</span><span>선 길이 " + Math.round(plan.total) + " cm</span>"
-      : "<span>쓸 내용을 넣어 보세요</span>";
-    if (!animate || reduce || !plan.segs.length) { paint(plan.end + 1); return; }
+    readout.textContent = c.text.trim()
+      ? "글자 높이 " + plan.h.toFixed(1) + " cm · " + plan.n + "획 · 선 길이 " + Math.round(plan.total) + " cm"
+      : "쓸 내용을 넣어 보세요";
+    if (!animate || reduce || !plan.segs.length) { paint(plan.end + 2); return; }
     var start = performance.now();
-    pen.style.opacity = 0;
     paint(0);
-    (function tick(now) {
-      var t = (now - start) / 1000;
+    (function tick() {
+      var t = Math.max((performance.now() - start) / 1000, 0);
       paint(t);
-      if (t < plan.end + 0.1) raf = requestAnimationFrame(tick);
-    })(start);
+      if (t < plan.end + 0.1) raf = requestAnimationFrame(tick); else paint(plan.end + 2);
+    })();
   }
 
   var typing = 0;
-  input.addEventListener("input", function () {           // 치는 동안은 바로 보여 주고, 손을 멈추면 한 번 써 보인다
+  input.addEventListener("input", function () {            // 치는 동안은 바로 보여 주고, 손을 멈추면 로봇이 쓴다
     clearTimeout(typing);
     show(false);
-    typing = setTimeout(function () { show(true); }, 700);
+    typing = setTimeout(function () { show(true); }, 650);
   });
-  form.addEventListener("submit", function (e) { e.preventDefault(); show(true); });
+  form.addEventListener("submit", function (e) { e.preventDefault(); clearTimeout(typing); show(true); });
   document.querySelectorAll(".chip").forEach(function (b) {
-    b.addEventListener("click", function () { input.value = b.getAttribute("data-text"); show(true); });
+    b.addEventListener("click", function () { input.value = b.getAttribute("data-text"); clearTimeout(typing); show(true); });
   });
-
   var me = document.getElementById("view-me"), robot = document.getElementById("view-robot");
-  var sideTop = document.getElementById("side-top"), sideBottom = document.getElementById("side-bottom");
   function setView(isRobot) {
-    view.setAttribute("class", isRobot ? "is-robot" : "");
+    stage.setAttribute("class", isRobot ? "is-robot" : "");
     me.setAttribute("aria-pressed", String(!isRobot));
     robot.setAttribute("aria-pressed", String(isRobot));
-    sideTop.textContent = isRobot ? "읽는 사람 쪽" : "로봇 쪽";
-    sideBottom.textContent = isRobot ? "로봇 쪽" : "읽는 사람 쪽";
   }
   me.addEventListener("click", function () { setView(false); });
   robot.addEventListener("click", function () { setView(true); });
 
-  show(false);                                            // 처음에는 다 쓴 모습으로
-  if (!reduce && "IntersectionObserver" in window) {      // 화면에 처음 들어올 때 한 번 써 보인다
-    var seen = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) { seen.disconnect(); show(true); }
-    }, { threshold: 0.6 });
-    seen.observe(document.getElementById("wb"));
-  }
+  show(false);                                            // 처음에는 다 쓴 모습
+  if (!reduce) setTimeout(function () { show(true); }, 700);   // 곧바로 한 번 써 보인다
 })();
 </script>
 </body>
