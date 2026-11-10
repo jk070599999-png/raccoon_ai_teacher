@@ -344,7 +344,8 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
 .tech h3 { font-size: 1.25rem; }
 .tech p { margin-top: 10px; color: var(--muted); font-size: 0.98rem; }
 .tech__m { margin-top: auto; padding-top: 14px; font: 500 0.8125rem/1.4 var(--font-mono); word-spacing: -0.2em; color: var(--marker); font-variant-numeric: tabular-nums; }
-.facts--wide { max-width: none; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(44px, 6vw, 72px); }
+.facts-cap { margin: clamp(44px, 6vw, 72px) 0 12px; }
+.facts--wide { max-width: none; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 0; }
 @media (max-width: 900px) {
   .tech { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts--wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -584,7 +585,8 @@ h3 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.03em; }
         <li><h3>펜이 뜨지 않게</h3><p>로봇 쪽으로 다가오는 선에서는 펜이 떠서 점선이 됐습니다. 목표를 0.5 mm씩 잘게 보내 해결했습니다.</p><span class="tech__m">뜨는 높이 13 mm → 0.47 mm 이하</span></li>
         <li><h3>안전 장치</h3><p>모든 이동은 범위와 도달 여부 검사를 통과해야 하고, 속도에는 상한이 있습니다. 기본 실행은 로봇을 움직이지 않는 미리보기입니다.</p><span class="tech__m">속도 상한 30 / 100</span></li>
       </ul>
-      <dl class="facts facts--wide" aria-label="마지막 집 그림에서 잰 값">
+      <p class="kicker facts-cap">마지막 집 그림에서 잰 값</p>
+      <dl class="facts facts--wide">
         <div><dt>집 그림 크기</dt><dd>12.0 × 10.9 cm</dd></div>
         <div><dt>그리는 시간</dt><dd>105초</dd></div>
         <div><dt>평균 위치 오차</dt><dd>2.1 mm</dd></div>
